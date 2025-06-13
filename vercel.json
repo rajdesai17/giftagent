@@ -1,0 +1,8 @@
+{
+  "cron": [
+    {
+      "path": "/api/sendGifts",
+      "schedule": "30 3 * * *" // 9:00 AM IST = 3:30 AM UTC
+    }
+  ]
+} 
