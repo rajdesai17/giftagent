@@ -1,0 +1,70 @@
+InvestorBot OAuth Setup Guide
+============================
+
+This document explains how OAuth is implemented in InvestorBot for connecting user wallets via the Payman platform. It covers dashboard setup, environment variables, frontend logic, callback handling, and security notes.
+
+---
+
+1. Payman Dashboard Configuration
+---------------------------------
+- **Register your app** at [Payman Dashboard](https://app.paymanai.com/developer/apps).
+- Set the following fields:
+  - **App Name**: e.g., InvestorBot
+  - **Redirect URI**: `https://yourdomain.com/oauth-callback` (for local dev: `http://localhost:5173/oauth-callback`)
+  - **Privacy Policy URL** and **Terms of Service URL**: Required for production.
+- After registration, note your **Client ID** and **Client Secret**.
+- Under 'OAuth', ensure the correct redirect URI is whitelisted.
+- For more, see [Payman OAuth Docs](https://docs.paymanai.com/overview/oauth).
+
+2. Environment Variables
+------------------------
+- Add the following to your `.env` file (never commit secrets):
+  - `VITE_PAYMAN_CLIENT_ID=your_client_id_here`
+  - `VITE_PAYMAN_CLIENT_SECRET=your_client_secret_here`
+- These are loaded via Vite and used in the app for OAuth and API calls.
+
+3. Frontend OAuth Flow
+----------------------
+- On the landing page, a 'Connect Payman' button (see `Landing.tsx`) triggers the OAuth flow.
+- The handler (see `Index.tsx`):
+  ```js
+  const clientId = import.meta.env.VITE_PAYMAN_CLIENT_ID;
+  const redirectUri = encodeURIComponent(window.location.origin + '/oauth-callback');
+  const oauthUrl = `https://app.paymanai.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=payments`;
+  window.location.href = oauthUrl;
+  ```
+- This redirects the user to Payman, where they log in and approve access.
+
+4. OAuth Callback Handling
+--------------------------
+- After approval, Payman redirects to `/oauth-callback?code=...`.
+- The page `src/pages/oauth-callback.tsx` runs:
+  - Extracts the `code` from the URL.
+  - Exchanges it for an access token using:
+    ```js
+    const payman = PaymanClient.withAuthCode({ clientId }, code);
+    ```
+  - On success, you can now use the `payman` client to make authenticated API calls on behalf of the user.
+  - (TODO: Store the token/client in app state or context for later use.)
+  - Shows a success or error message to the user.
+
+5. Security & Best Practices
+----------------------------
+- **Never expose your client secret in frontend code or public repos.**
+- Only the client ID is used in the browser; the secret is for server-to-server calls.
+- Always use HTTPS in production for OAuth redirects.
+- Store tokens securely (e.g., in memory, context, or secure cookies if backend is used).
+- For more, see [Payman Security Docs](https://docs.paymanai.com/overview/security).
+
+6. References
+-------------
+- Payman OAuth Quickstart: https://docs.paymanai.com/overview/oauth
+- Payman SDK Docs: https://docs.paymanai.com/sdk/ts
+- Example OAuth Flow: https://docs.paymanai.com/overview/oauth#example-oauth-flow
+
+---
+
+**Summary:**
+- User clicks 'Connect Payman' → redirected to Payman OAuth → on success, redirected back with code → code exchanged for token in `/oauth-callback` → app can now use Payman on user's behalf.
+
+For questions or troubleshooting, see the [Payman Docs](https://docs.paymanai.com/) or contact support. 

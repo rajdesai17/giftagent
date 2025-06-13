@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Gift, CheckCircle } from 'lucide-react';
 import { useApp, gifts } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
+import payman from '../lib/payman';
+import { PaymanClient } from '@paymanai/payman-ts';
 
 interface Message {
   id: string;
@@ -96,19 +98,30 @@ export default function ChatAgent() {
       };
     }
 
-    // Process the transaction
+    // Real Payman payment logic using credentials
     try {
+      const TO_WALLET_ID = 'pd-1f048707-53da-6908-a779-972e0be1d5f8';
+      const FROM_WALLET_ID = import.meta.env.VITE_FROM_WALLET_ID;
+      const payment = await payman.payments.create({
+        fromWalletId: FROM_WALLET_ID,
+        toWalletId: TO_WALLET_ID,
+        amount: gift.price,
+        currency: 'TSD',
+        description: `Birthday gift for ${contact.name}`,
+        metadata: { contactId: contact.id, giftId: gift.id }
+      });
+
       await addTransaction({
         recipientName: contact.name,
         gift: gift,
         status: 'paid',
         transactionDate: new Date().toISOString(),
-        paymanId: generateTransactionId()
+        paymanId: payment.id
       });
 
       return {
         success: true,
-        response: `Perfect! I've sent ${gift.name} ($${gift.price}) to ${contact.name} at ${contact.address}. Payment processed and the gift is on its way! 🎉`,
+        response: `Perfect! I've sent ${gift.name} (${gift.price} TSD) to ${contact.name} at ${contact.address}. Payment processed and the gift is on its way! 🎉`,
         giftSent: {
           giftName: gift.name,
           recipientName: contact.name,
@@ -118,7 +131,7 @@ export default function ChatAgent() {
     } catch (error) {
       return {
         success: false,
-        response: "Sorry, there was an error processing the transaction. Please try again."
+        response: "Sorry, there was an error processing the payment. Please try again."
       };
     }
   };
