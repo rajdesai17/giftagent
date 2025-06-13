@@ -1,0 +1,125 @@
+# Birthday Gift AI Agent – Minimal Build Spec
+
+## Overview
+
+A simple gifting automation agent.
+
+Users add birthdays of people they care about — along with their name, address, and a gift selected from a mock store. The agent automatically sends that gift on their birthday using Payman's test wallet (TSD). Delivery is simulated, and all gift history is logged.
+
+No AI gift selection — the user chooses the gift in advance.
+No manual approval — the agent handles payments and shipping automatically on the scheduled day.
+
+---
+
+## Core Flow
+
+1. **User logs in via Supabase Auth**
+2. **User adds a contact**: name, birthday, address, and selected gift
+3. **System stores gift and recipient info**
+4. **Agent runs daily**:
+
+   * Checks for birthdays today
+   * If found, triggers payment via Payman
+   * Simulates delivery (shipped → delivered)
+5. **All transactions are stored and viewable in history**
+
+---
+
+## Tech Stack
+
+* **Frontend**: React + Tailwind + Vite
+* **Auth**: Supabase Auth
+* **Backend**: Node.js (Express or serverless)
+* **Database**: Supabase DB (Postgres)
+* **Scheduler**: cron job (Vercel Cron or node-cron)
+* **Payments**: Payman SDK (test mode / TSD)
+* **Mock Store**: JSON of gift items with name, image, price
+
+---
+
+## Key Features
+
+### 1. Contact Setup
+
+* Name
+* Birthday (MM-DD)
+* Full shipping address
+* Selected gift (from predefined mock store)
+
+### 2. Daily Automation
+
+* Runs every morning
+* Checks all stored contacts for birthdays
+* If match found, retrieves gift + address
+* Triggers Payman payment and logs transaction
+* Simulates 3-day delivery status updates
+
+### 3. Transaction History
+
+* Shows list of past gifts sent
+* Status: paid, shipped, delivered
+* Includes Payman transaction ID
+
+---
+
+## Example Data
+
+**Contact**
+
+json
+{
+  "name": "Nina",
+  "birthday": "06-25",
+  "address": {
+    "street": "221B Baker Street",
+    "city": "London",
+    "zip": "NW1",
+    "country": "UK"
+  },
+  "gift_id": "gift_023"
+}
+
+
+**Gift**
+
+json
+{
+  "id": "gift_023",
+  "name": "Succulent Plant",
+  "price": 30,
+  "image": "https://example.com/succulent.jpg"
+}
+
+
+---
+
+## Environment Variables
+
+SUPABASE_URL=
+SUPABASE_ANON_KEY=
+
+PAYMAN_CLIENT_ID=
+PAYMAN_CLIENT_SECRET=
+PAYMAN_ENVIRONMENT=test
+FROM_WALLET_ID=
+
+CRON_TIME=9:00
+
+
+---
+
+## Deployment
+
+* Use Vercel for frontend + backend (API routes)
+* Use Vercel Cron to run birthday scan daily
+* Supabase handles auth and data
+* Payman SDK runs securely in serverless function
+
+---
+
+## Summary
+
+This is a minimal birthday automation tool:
+The user stores who, when, and what to gift — and the AI agent makes it happen automatically on the birthday using Payman test payments.
+
+Clean. Private. No decisions made by AI. Just remember and act.

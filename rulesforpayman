@@ -1,0 +1,15 @@
+
+The project uses the official Payman TypeScript SDK:
+"@paymanai/payman-ts": "^1.0.12"
+
+Client Setup (src/lib/payman.js)
+The Payman client is initialized in a dedicated module:
+import { PaymanClient } from "@paymanai/payman-ts";
+
+const payman = PaymanClient.withCredentials({
+  clientId: import.meta.env.VITE_PAYMAN_CLIENT_ID,
+  clientSecret: import.meta.env.VITE_PAYMAN_CLIENT_SECRET,
+});
+
+export default payman;
+

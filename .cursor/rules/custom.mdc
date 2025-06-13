@@ -1,0 +1,21 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Rules for Building and Maintaining
+
+**Clarity and Brevity**
+   - Write in clear, concise language. Avoid jargon unless it is explained.
+   - Use bullet points, tables, and code blocks for readability.
+   - Keep sections minimal but informative—do not overload with unnecessary details.
+**Official Documentation Links**
+   - When referencing external tools, SDKs, or APIs (e.g., Payman, Gemini, Vercel), always include a link to the official documentation. - https://docs.paymanai.com/overview/quickstart
+**Error Handling and Troubleshooting**
+   - If the answer is not found, consult the official documentation for the relevant tool or library.
+   - Document common errors and their solutions in a dedicated FAQ or Troubleshooting section if needed.
+
+
+
+
+
