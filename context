@@ -106,8 +106,6 @@ FROM_WALLET_ID=
 CRON_TIME=9:00
 
 
----
-
 ## Deployment
 
 * Use Vercel for frontend + backend (API routes)
