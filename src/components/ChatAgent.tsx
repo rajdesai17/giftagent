@@ -98,18 +98,22 @@ export default function ChatAgent() {
       };
     }
 
-    // Real Payman payment logic using credentials
+    // Real Payman payment logic using API route
     try {
       const TO_WALLET_ID = 'pd-1f048707-53da-6908-a779-972e0be1d5f8';
-      const FROM_WALLET_ID = import.meta.env.VITE_FROM_WALLET_ID;
-      const payment = await payman.payments.create({
-        fromWalletId: FROM_WALLET_ID,
-        toWalletId: TO_WALLET_ID,
-        amount: gift.price,
-        currency: 'TSD',
-        description: `Birthday gift for ${contact.name}`,
-        metadata: { contactId: contact.id, giftId: gift.id }
+      const response = await fetch('/api/sendPayment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          toWalletId: TO_WALLET_ID,
+          amount: gift.price,
+          description: `Birthday gift for ${contact.name}`,
+          metadata: { contactId: contact.id, giftId: gift.id }
+        })
       });
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error);
+      const payment = result.payment;
 
       await addTransaction({
         recipientName: contact.name,
@@ -129,6 +133,7 @@ export default function ChatAgent() {
         }
       };
     } catch (error) {
+      console.error('Payman payment error:', error);
       return {
         success: false,
         response: "Sorry, there was an error processing the payment. Please try again."
