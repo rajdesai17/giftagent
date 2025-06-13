@@ -42,12 +42,12 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const mockGifts: Gift[] = [
-  { id: '1', name: 'Wireless Headphones', price: 129.99, image: 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Electronics' },
-  { id: '2', name: 'Succulent Plant Set', price: 39.99, image: 'https://images.pexels.com/photos/1048035/pexels-photo-1048035.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Plants' },
-  { id: '3', name: 'Artisan Coffee Beans', price: 24.99, image: 'https://images.pexels.com/photos/977876/pexels-photo-977876.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Food' },
-  { id: '4', name: 'Cozy Blanket', price: 59.99, image: 'https://images.pexels.com/photos/7188747/pexels-photo-7188747.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Home' },
-  { id: '5', name: 'Essential Oil Diffuser', price: 79.99, image: 'https://images.pexels.com/photos/6980537/pexels-photo-6980537.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Wellness' },
-  { id: '6', name: 'Leather Journal', price: 34.99, image: 'https://images.pexels.com/photos/1033471/pexels-photo-1033471.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Stationery' }
+  { id: '1', name: 'Mini Succulent', price: 12, image: 'https://images.pexels.com/photos/1048035/pexels-photo-1048035.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Plants' },
+  { id: '2', name: 'Artisan Chocolate Bar', price: 8, image: 'https://images.pexels.com/photos/977876/pexels-photo-977876.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Food' },
+  { id: '3', name: 'Cute Mug', price: 15, image: 'https://images.pexels.com/photos/1033471/pexels-photo-1033471.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Home' },
+  { id: '4', name: 'Desk Plant', price: 18, image: 'https://images.pexels.com/photos/1048035/pexels-photo-1048035.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Plants' },
+  { id: '5', name: 'Scented Candle', price: 16, image: 'https://images.pexels.com/photos/6980537/pexels-photo-6980537.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Wellness' },
+  { id: '6', name: 'Notebook', price: 10, image: 'https://images.pexels.com/photos/1033471/pexels-photo-1033471.jpeg?auto=compress&cs=tinysrgb&w=400', category: 'Stationery' }
 ];
 
 export const gifts = mockGifts;

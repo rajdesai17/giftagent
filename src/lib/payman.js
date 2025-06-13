@@ -1,3 +1,4 @@
+// @ts-ignore
 import { PaymanClient } from "@paymanai/payman-ts";
 
 const payman = PaymanClient.withCredentials({

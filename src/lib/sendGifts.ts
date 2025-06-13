@@ -2,11 +2,11 @@ import { createClient } from '@supabase/supabase-js';
 import payman from './payman';
 
 const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
+      process.env.VITE_SUPABASE_URL!,
+      process.env.VITE_SUPABASE_ANON_KEY!
 );
 
-const FROM_WALLET_ID = process.env.FROM_WALLET_ID!;
+const FROM_WALLET_ID = process.env.VITE_FROM_WALLET_ID!;
 
 async function sendGiftsForToday() {
   // Get today's MM-DD
@@ -29,7 +29,7 @@ async function sendGiftsForToday() {
       fromWalletId: FROM_WALLET_ID,
       toWalletId,
       amount,
-      currency: 'USD',
+      currency: 'TSD',
       description: `Birthday gift for ${contact.name}`,
       metadata: { contactId: contact.id, giftId: contact.gift_id }
     });
