@@ -18,6 +18,17 @@ export default function Dashboard() {
           <p className="text-gray-600 mt-2">
             Manage birthdays and schedule gifts for your friends
           </p>
+          <button
+            onClick={() => {
+              const clientId = import.meta.env.VITE_PAYMAN_CLIENT_ID;
+              const redirectUri = encodeURIComponent(window.location.origin + '/oauth-callback');
+              const oauthUrl = `https://app.paymanai.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=payments`;
+              window.location.href = oauthUrl;
+            }}
+            className="mt-4 flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-700 transition-colors"
+          >
+            <span>Connect Payman</span>
+          </button>
         </div>
         <div className="flex space-x-3">
           <button
