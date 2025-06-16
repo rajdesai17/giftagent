@@ -3,16 +3,16 @@
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ESNext"],
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "strict": true,
     "skipLibCheck": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
-    // Vercel handles the output, so we don't need to specify an outDir.
     "noEmit": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": false
   },
-  "include": ["api"]
+  "include": ["api/**/*"]
 }
