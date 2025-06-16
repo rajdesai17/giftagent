@@ -1,24 +1,28 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import payman from '../src/lib/payman-server';
+import payman from '../src/lib/payman-server.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
+  const {
+    recipient_wallet_address,
+    amount,
+    token_address,
+    token_symbol,
+    chain_id,
+  } = req.body;
+
   try {
-    const { toWalletId, amount, description, metadata } = req.body;
-    const fromWalletId = process.env.FROM_WALLET_ID;
-    const prompt = `Send ${amount} TSD to wallet ${toWalletId}. Description: ${description}`;
-    const response = await payman.ask(prompt, {
+    const prompt = `Send ${amount} ${token_symbol} from wallet on chain ${chain_id} to ${recipient_wallet_address}`;
+    const result = await payman.ask(prompt, {
       metadata: {
-        fromWalletId,
-        ...metadata
+        token_address: token_address,
       }
     });
-    res.status(200).json({ success: true, payment: response });
+    res.status(200).json({ success: true, ...result });
   } catch (error) {
-    console.error('API payment error:', error);
-    res.status(500).json({ success: false, error: error.message || error.toString() });
+    res.status(500).json({ success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' });
   }
-} 
+}

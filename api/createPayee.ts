@@ -1,6 +1,13 @@
 import { PaymanClient } from '@paymanai/payman-ts';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-export default async function handler(req, res) {
+// Define an interface for the expected structure of the response from the .ask() call.
+// We only care about the payeeId for now.
+interface PayeeResponse {
+  payeeId: string;
+}
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -18,12 +25,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    // The SDK's withToken method requires an `expiresIn` field.
-    // Since we only have the token from the authorization header, we'll supply a
-    // default value. This is a short-lived operation, so the exact expiry is not critical.
     const tokenObject = {
       accessToken: token,
-      expiresIn: 3600, // Default to 1 hour
+      expiresIn: 3600,
     };
     const client = PaymanClient.withToken(clientId, tokenObject);
 
@@ -33,11 +37,9 @@ export default async function handler(req, res) {
 
     const response = await client.ask(creationPrompt);
 
-    // The response type `FormattedTaskResponse` doesn't have a payeeId,
-    // but the actual response from the API might. We access it dynamically
-    // to avoid TypeScript errors and log the whole object for debugging.
     console.log('Received response from Payman .ask()', response);
-    const payeeId = response['payeeId'];
+    // Cast to unknown first, then to our expected type, as suggested by the compiler.
+    const payeeId = (response as unknown as PayeeResponse).payeeId;
 
     if (!payeeId) {
       console.error('Could not find payeeId in Payman response', response);

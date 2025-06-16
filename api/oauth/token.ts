@@ -1,6 +1,7 @@
 import { PaymanClient } from '@paymanai/payman-ts';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-export default async function handler(req, res) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   console.log('OAuth token endpoint called. Method:', req.method);
 
   if (req.method !== 'POST') {
@@ -63,17 +64,17 @@ export default async function handler(req, res) {
       expiresIn: tokenResponse.expiresIn,
     });
   } catch (error) {
-    console.error("Token exchange failed with error:", {
+    console.error("Token exchange failed with error:", error instanceof Error ? {
       name: error.name,
       message: error.message,
       stack: error.stack
-    });
+    } : error);
     
     const errorMessage = "Token exchange failed";
     
     res.status(500).json({ 
       error: errorMessage,
-      details: error.message || 'No further details available.'
+      details: error instanceof Error ? error.message : 'No further details available.'
     });
   }
 } 
