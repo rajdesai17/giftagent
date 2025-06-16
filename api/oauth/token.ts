@@ -1,4 +1,3 @@
-import { PaymanClient } from '@paymanai/payman-ts';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -34,8 +33,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.error("Critical: Missing Payman client credentials in environment variables.");
       return res.status(500).json({ error: "Server configuration error: Missing Payman credentials." });
     }
-    
+
     console.log('Initializing PaymanClient with auth code...');
+    
+    // Use dynamic import for ES module compatibility
+    const { PaymanClient } = await import('@paymanai/payman-ts');
     
     const client = new PaymanClient({
       clientId,
