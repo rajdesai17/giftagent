@@ -12,31 +12,41 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing name, address, or token' });
   }
 
-  const clientId = process.env.VITE_PAYMAN_CLIENT_ID || process.env.PAYMAN_CLIENT_ID;
-  const clientSecret = process.env.VITE_PAYMAN_CLIENT_SECRET || process.env.PAYMAN_CLIENT_SECRET;
-
-  if (!clientId || !clientSecret) {
-    return res.status(500).json({ error: 'Server configuration error' });
+  const clientId = process.env.PAYMAN_CLIENT_ID;
+  if (!clientId) {
+    return res.status(500).json({ error: 'Server configuration error: Missing Client ID' });
   }
 
   try {
-    const client = PaymanClient.withAuthToken(
-      {
-        clientId,
-        clientSecret,
-      },
-      token
-    );
+    // The SDK's withToken method requires an `expiresIn` field.
+    // Since we only have the token from the authorization header, we'll supply a
+    // default value. This is a short-lived operation, so the exact expiry is not critical.
+    const tokenObject = {
+      accessToken: token,
+      expiresIn: 3600, // Default to 1 hour
+    };
+    const client = PaymanClient.withToken(clientId, tokenObject);
 
-    const payee = await client.createPayee({
-      name,
-      // Assuming address is a simple string for the description
-      description: `Address: ${address}`, 
-    });
+    const creationPrompt = `Create a new payee named "${name}" with the address "${address}"`;
+    
+    console.log(`Sending prompt to Payman: "${creationPrompt}"`);
 
-    res.status(200).json({ payeeId: payee.payeeId });
+    const response = await client.ask(creationPrompt);
+
+    // The response type `FormattedTaskResponse` doesn't have a payeeId,
+    // but the actual response from the API might. We access it dynamically
+    // to avoid TypeScript errors and log the whole object for debugging.
+    console.log('Received response from Payman .ask()', response);
+    const payeeId = response['payeeId'];
+
+    if (!payeeId) {
+      console.error('Could not find payeeId in Payman response', response);
+      return res.status(500).json({ error: 'Failed to extract payeeId from Payman response' });
+    }
+
+    res.status(200).json({ payeeId: payeeId });
   } catch (error) {
-    console.error('Failed to create payee:', error);
+    console.error('Failed to create payee via .ask():', error);
     res.status(500).json({ error: 'Failed to create payee' });
   }
 } 

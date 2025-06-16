@@ -18,9 +18,9 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Authorization code is required' });
   }
   
-  // For Vercel deployment, environment variables don't have VITE_ prefix on server
-  const clientId = process.env.VITE_PAYMAN_CLIENT_ID || process.env.PAYMAN_CLIENT_ID;
-  const clientSecret = process.env.VITE_PAYMAN_CLIENT_SECRET || process.env.PAYMAN_CLIENT_SECRET;
+  // On Vercel, server-side environment variables should not have the VITE_ prefix.
+  const clientId = process.env.PAYMAN_CLIENT_ID;
+  const clientSecret = process.env.PAYMAN_CLIENT_SECRET;
   
   console.log('Environment check:', {
     hasClientId: !!clientId,
