@@ -1,0 +1,70 @@
+console Logs -
+Dashboard: Received OAuth message from popup Object
+index-DYV_DMsG.js:222 Dashboard: Extracted from redirectUri: Object
+index-DYV_DMsG.js:222 Dashboard: Exchanging code for token... Object
+index-DYV_DMsG.js:222 Dashboard: Sending request to /api/oauth/token with: Object
+api/oauth/token:1 
+            
+            
+           Failed to load resource: the server responded with a status of 500 ()Understand this error
+index-DYV_DMsG.js:222 Dashboard: Response status: 500
+index-DYV_DMsG.js:222 Dashboard: Error response body: {"error":"Token exchange failed","details":"Unexpected token 'export'"}
+a @ index-DYV_DMsG.js:222Understand this error
+index-DYV_DMsG.js:222 Dashboard: Failed to exchange code for token. Error: Token exchange failed with status: 500 - {"error":"Token exchange failed","details":"Unexpected token 'export'"}
+    at a (index-DYV_DMsG.js:222:12907)
+a @ index-DYV_DMsG.js:222Understand this error
+dashboard:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+
+
+
+vercel logs -
+OAuth token endpoint called. Method: POST
+Received authorization code: r8PfDsMY7-MsJ_Bt4Blv...
+Environment variable check: {
+  hasClientId: true,
+  hasClientSecret: true,
+  clientIdPrefix: 'pm-test',
+  nodeEnv: 'production',
+  vercelEnv: 'production'
+}
+Initializing PaymanClient with auth code...
+(node:4) Warning: Failed to load the ES module: /var/task/node_modules/@paymanai/payman-ts/dist/index.js. Make sure to set "type": "module" in the nearest package.json file or use the .mjs extension.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Dynamic import failed, trying eval require: /var/task/node_modules/@paymanai/payman-ts/dist/index.js:2643
+export {
+^^^^^^
+
+SyntaxError: Unexpected token 'export'
+    at wrapSafe (node:internal/modules/cjs/loader:1662:18)
+    at Module._compile (node:internal/modules/cjs/loader:1704:20)
+    at Object..js (node:internal/modules/cjs/loader:1895:10)
+    at Module.load (node:internal/modules/cjs/loader:1465:32)
+    at Function.<anonymous> (node:internal/modules/cjs/loader:1282:12)
+    at /opt/rust/nodejs.js:2:12456
+    at Function.Rr (/opt/rust/nodejs.js:2:12834)
+    at Ae.e.<computed>.Me._load (/opt/rust/nodejs.js:2:12426)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+(node:4) Warning: Failed to load the ES module: /var/task/node_modules/@paymanai/payman-ts/dist/index.js. Make sure to set "type": "module" in the nearest package.json file or use the .mjs extension.
+Token exchange failed with error: {
+  name: 'SyntaxError',
+  message: "Unexpected token 'export'",
+  stack: '/var/task/node_modules/@paymanai/payman-ts/dist/index.js:2643\n' +
+    'export {\n' +
+    '^^^^^^\n' +
+    '\n' +
+    "SyntaxError: Unexpected token 'export'\n" +
+    '    at wrapSafe (node:internal/modules/cjs/loader:1662:18)\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1704:20)\n' +
+    '    at Object..js (node:internal/modules/cjs/loader:1895:10)\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1465:32)\n' +
+    '    at Function.<anonymous> (node:internal/modules/cjs/loader:1282:12)\n' +
+    '    at /opt/rust/nodejs.js:2:12456\n' +
+    '    at Function.Rr (/opt/rust/nodejs.js:2:12834)\n' +
+    '    at Ae.e.<computed>.Me._load (/opt/rust/nodejs.js:2:12426)\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n' +
+    '    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)'
+}

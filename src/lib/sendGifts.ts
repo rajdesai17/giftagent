@@ -1,6 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
-// @ts-expect-error - payman-server.js doesn't have type declarations
-import payman from './payman-server';
+import paymanServer from './payman-server';
+
+interface PaymanClient {
+  ask(prompt: string, options?: { metadata?: Record<string, unknown> }): Promise<unknown>;
+}
 
 const supabase = createClient(
       process.env.VITE_SUPABASE_URL!,
@@ -38,6 +41,7 @@ async function sendGiftsForToday() {
     const toPayeeId = 'pd-1f048707-53da-6908-a779-972e0be1d5f8'; // Fixed test payee ID
     
     // Use the new Payman client with ask() method
+    const payman = await paymanServer.getPaymanClient() as PaymanClient;
     const paymentPrompt = `Send ${amount} TSD to payee ${toPayeeId}. Description: Birthday gift for ${contact.name}`;
     await payman.ask(paymentPrompt);
 

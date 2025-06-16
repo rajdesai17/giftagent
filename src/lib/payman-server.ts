@@ -1,15 +1,25 @@
-import { PaymanClient } from '@paymanai/payman-ts';
+// Create a singleton Payman client instance for server-side use
+let paymanInstance: unknown = null;
 
-const clientId = process.env.PAYMAN_CLIENT_ID as string;
-const clientSecret = process.env.PAYMAN_CLIENT_SECRET as string;
+async function getPaymanClient() {
+  if (!paymanInstance) {
+    const clientId = process.env.PAYMAN_CLIENT_ID as string;
+    const clientSecret = process.env.PAYMAN_CLIENT_SECRET as string;
 
-if (!clientId || !clientSecret) {
-  throw new Error('Missing Payman credentials in environment variables');
+    if (!clientId || !clientSecret) {
+      throw new Error('Missing Payman credentials in environment variables');
+    }
+
+    // Use dynamic import for ES module compatibility
+    const { PaymanClient } = await import('@paymanai/payman-ts');
+    
+    paymanInstance = PaymanClient.withCredentials({
+      clientId,
+      clientSecret,
+    });
+  }
+  
+  return paymanInstance;
 }
 
-const payman = PaymanClient.withCredentials({
-  clientId,
-  clientSecret,
-});
-
-export default payman; 
+export default { getPaymanClient }; 

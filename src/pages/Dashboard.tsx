@@ -77,9 +77,9 @@ export default function Dashboard() {
       }
 
       const responseData = await response.json();
-      console.log('Dashboard: Token exchange successful:', { hasAccessToken: !!responseData.accessToken, expiresIn: responseData.expiresIn });
+      console.log('Dashboard: Token exchange successful:', { hasAccessToken: !!responseData.access_token, expiresIn: responseData.expires_in });
       
-      const { accessToken, expiresIn } = responseData;
+      const { access_token: accessToken, expires_in: expiresIn } = responseData;
       if (!accessToken) {
         throw new Error('No access token in response.');
       }
