@@ -10,14 +10,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const { code, redirectUri } = req.body;
     console.log('Received authorization code:', code ? `${code.substring(0, 20)}...` : 'undefined');
-    console.log('Received redirectUri:', redirectUri);
     
     if (!code || !redirectUri) {
-      console.error('No authorization code or redirectUri provided in request body', { 
-        hasCode: !!code, 
-        hasRedirectUri: !!redirectUri,
-        requestBody: req.body 
-      });
+      console.error('No authorization code or redirectUri provided in request body');
       return res.status(400).json({ error: 'Authorization code and redirectUri are required' });
     }
     
@@ -41,26 +36,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     console.log('Initializing PaymanClient with auth code...');
     
-    // Use CommonJS wrapper to avoid ES module issues
-    const { createPaymanClient } = eval('require')('../payman-wrapper.js');
-    const PaymanClient = createPaymanClient();
+    // Use dynamic import for ES module compatibility
+    const { PaymanClient } = await import('@paymanai/payman-ts');
     
-    const client = PaymanClient.withAuthCode(
-      {
-        clientId,
-        clientSecret,
-      },
-      code
-    );
+    const client = new PaymanClient({
+      clientId,
+      clientSecret,
+      authorizationCode: code,
+      redirectUri,
+      environment: 'test'
+    });
 
     console.log('Calling getAccessToken...');
     const tokenResponse = await client.getAccessToken();
     console.log('Token response received:', { 
-      hasAccessToken: !!tokenResponse?.accessToken, 
-      expiresIn: tokenResponse?.expiresIn,
+      hasAccessToken: !!tokenResponse?.access_token, 
+      tokenType: tokenResponse?.token_type,
+      expiresIn: tokenResponse?.expires_in,
     });
 
-    if (!tokenResponse || !tokenResponse.accessToken) {
+    if (!tokenResponse || !tokenResponse.access_token) {
       console.error("Invalid token response from Payman:", tokenResponse);
       return res.status(500).json({ error: "Invalid token response from Payman" });
     }
@@ -69,9 +64,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     res.json({
       success: true,
-      access_token: tokenResponse.accessToken,
-      token_type: 'Bearer',
-      expires_in: tokenResponse.expiresIn,
+      access_token: tokenResponse.access_token,
+      token_type: tokenResponse.token_type,
+      expires_in: tokenResponse.expires_in,
     });
   } catch (error: unknown) {
     const errorObj = error instanceof Error ? {

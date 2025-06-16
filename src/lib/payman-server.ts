@@ -10,9 +10,8 @@ async function getPaymanClient() {
       throw new Error('Missing Payman credentials in environment variables');
     }
 
-    // Use CommonJS wrapper to avoid ES module issues
-    const { createPaymanClient } = eval('require')('../../api/payman-wrapper.js');
-    const PaymanClient = createPaymanClient();
+    // Use dynamic import for ES module compatibility
+    const { PaymanClient } = await import('@paymanai/payman-ts');
     
     paymanInstance = PaymanClient.withCredentials({
       clientId,
