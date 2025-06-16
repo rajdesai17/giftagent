@@ -1,0 +1,8 @@
+{
+  "name": "@paymanai/payman-ts",
+  "version": "1.0.12",
+  "type": "module",
+  "description": "The official Payman SDK for TypeScript",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts"
+} 

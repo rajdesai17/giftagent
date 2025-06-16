@@ -1,4 +1,4 @@
-import * as Payman from '@paymanai/payman-ts';
+import { PaymanClient } from '@paymanai/payman-ts';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -18,8 +18,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     
     // On Vercel, server-side environment variables should not have the VITE_ prefix.
-    const clientId = process.env.PAYMAN_CLIENT_ID;
-    const clientSecret = process.env.PAYMAN_CLIENT_SECRET;
+    const clientId = process.env.PAYMAN_CLIENT_ID as string;
+    const clientSecret = process.env.PAYMAN_CLIENT_SECRET as string;
     
     // Detailed logging for debugging Vercel environment variables
     console.log('Environment variable check:', {
@@ -37,7 +37,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     console.log('Initializing PaymanClient with auth code...');
     
-    const client = Payman.PaymanClient.withAuthCode(
+    const client = PaymanClient.withAuthCode(
       {
         clientId,
         clientSecret,

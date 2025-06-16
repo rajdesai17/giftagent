@@ -1,4 +1,4 @@
-import * as Payman from '@paymanai/payman-ts';
+import { PaymanClient } from '@paymanai/payman-ts';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Define an interface for the expected structure of the response from the .ask() call.
@@ -19,7 +19,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Missing name, address, or token' });
   }
 
-  const clientId = process.env.PAYMAN_CLIENT_ID;
+  const clientId = process.env.PAYMAN_CLIENT_ID as string;
   if (!clientId) {
     return res.status(500).json({ error: 'Server configuration error: Missing Client ID' });
   }
@@ -29,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       accessToken: token,
       expiresIn: 3600,
     };
-    const client = Payman.PaymanClient.withToken(clientId, tokenObject);
+    const client = PaymanClient.withToken(clientId, tokenObject);
 
     const creationPrompt = `Create a new payee named "${name}" with the address "${address}"`;
     
