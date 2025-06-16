@@ -59,8 +59,9 @@ export default function Dashboard() {
   const exchangeCodeForToken = async (code: string) => {
     console.log('Dashboard: Exchanging code for token...', { codeLength: code.length, codePreview: code.substring(0, 20) + '...' });
     try {
-      const requestBody = { code };
-      console.log('Dashboard: Sending request to /api/oauth/token with:', requestBody);
+      const redirectUri = `${window.location.origin}/oauth-callback`;
+      const requestBody = { code, redirectUri };
+      console.log('Dashboard: Sending request to /api/oauth/token with:', { code: code.substring(0, 20) + '...', redirectUri });
       
       const response = await fetch('/api/oauth/token', {
         method: 'POST',
