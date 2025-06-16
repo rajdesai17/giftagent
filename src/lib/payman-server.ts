@@ -1,4 +1,4 @@
-import { PaymanClient } from "@paymanai/payman-ts";
+import * as Payman from "@paymanai/payman-ts";
 
 // This function initializes the Payman client for server-side use.
 // It ensures that the required environment variables are present.
@@ -11,7 +11,7 @@ function createPaymanClient() {
   }
   
   // Machine-to-machine (client credentials) flow for backend/server use only
-  return PaymanClient.withCredentials({
+  return Payman.PaymanClient.withCredentials({
     clientId,
     clientSecret,
   });
