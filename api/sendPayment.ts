@@ -16,7 +16,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const prompt = `Send ${amount} ${token_symbol} from wallet on chain ${chain_id} to ${recipient_wallet_address}`;
-    const result = await payman.ask(prompt, {
+    const paymanClient = await payman; // Wait for the client promise
+    const result = await paymanClient.ask(prompt, {
       metadata: {
         token_address: token_address,
       }

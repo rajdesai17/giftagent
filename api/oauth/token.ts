@@ -1,4 +1,3 @@
-import * as Payman from '@paymanai/payman-ts';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -37,7 +36,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     console.log('Initializing PaymanClient with auth code...');
     
-    const client = Payman.PaymanClient.withAuthCode(
+    // Dynamic import to resolve Vercel ES module issues
+    const { PaymanClient } = await import('@paymanai/payman-ts');
+    const client = PaymanClient.withAuthCode(
       {
         clientId,
         clientSecret,

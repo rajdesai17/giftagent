@@ -1,4 +1,3 @@
-import * as Payman from '@paymanai/payman-ts';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Define an interface for the expected structure of the response from the .ask() call.
@@ -29,7 +28,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       accessToken: token,
       expiresIn: 3600,
     };
-    const client = Payman.PaymanClient.withToken(clientId, tokenObject);
+    // Dynamic import to resolve Vercel ES module issues
+    const { PaymanClient } = await import('@paymanai/payman-ts');
+    const client = PaymanClient.withToken(clientId, tokenObject);
 
     const creationPrompt = `Create a new payee named "${name}" with the address "${address}"`;
     
