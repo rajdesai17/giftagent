@@ -17,6 +17,7 @@ export interface Contact {
   address: string;
   gift: Gift;
   createdAt: string;
+  payeeId?: string;
 }
 
 export interface Transaction {
@@ -32,7 +33,7 @@ interface AppContextType {
   contacts: Contact[];
   transactions: Transaction[];
   loading: boolean;
-  addContact: (contact: Omit<Contact, 'id' | 'createdAt'>) => Promise<void>;
+  addContact: (contact: Omit<Contact, 'id' | 'createdAt'> & { payeeId?: string }) => Promise<void>;
   deleteContact: (id: string) => Promise<void>;
   addTransaction: (transaction: Omit<Transaction, 'id'>) => Promise<void>;
   showToast: (message: string, type?: 'success' | 'error') => void;
@@ -96,6 +97,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           category: contact.gift_category,
         },
         createdAt: contact.created_at,
+        payeeId: contact.payee_id,
       }));
 
       setContacts(formattedContacts);
@@ -141,7 +143,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const addContact = async (contactData: Omit<Contact, 'id' | 'createdAt'>) => {
+  const addContact = async (contactData: Omit<Contact, 'id' | 'createdAt'> & { payeeId?: string }) => {
     if (!user) return;
 
     try {
@@ -157,6 +159,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           gift_price: contactData.gift.price,
           gift_image: contactData.gift.image,
           gift_category: contactData.gift.category,
+          payee_id: contactData.payeeId,
         });
 
       if (error) throw error;

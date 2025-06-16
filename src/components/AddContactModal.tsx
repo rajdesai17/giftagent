@@ -16,26 +16,52 @@ export default function AddContactModal({ isOpen, onClose }: AddContactModalProp
     selectedGift: null as GiftType | null
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.birthday || !formData.address || !formData.selectedGift) {
       return;
     }
 
-    addContact({
-      name: formData.name,
-      birthday: formData.birthday,
-      address: formData.address,
-      gift: formData.selectedGift
-    });
+    try {
+      const tokenData = JSON.parse(localStorage.getItem('payman_token') || '{}');
+      if (!tokenData.accessToken) {
+        throw new Error('Not connected to Payman');
+      }
 
-    setFormData({
-      name: '',
-      birthday: '',
-      address: '',
-      selectedGift: null
-    });
-    onClose();
+      const payeeResponse = await fetch('/api/createPayee', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokenData.accessToken}`,
+        },
+        body: JSON.stringify({ name: formData.name, address: formData.address }),
+      });
+
+      if (!payeeResponse.ok) {
+        throw new Error('Failed to create Payee in Payman');
+      }
+
+      const { payeeId } = await payeeResponse.json();
+
+      addContact({
+        name: formData.name,
+        birthday: formData.birthday,
+        address: formData.address,
+        gift: formData.selectedGift,
+        payeeId: payeeId,
+      });
+
+      setFormData({
+        name: '',
+        birthday: '',
+        address: '',
+        selectedGift: null
+      });
+      onClose();
+    } catch (error) {
+      console.error(error);
+      // Here you could set an error state and display it to the user
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
