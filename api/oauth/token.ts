@@ -1,3 +1,4 @@
+import { PaymanClient } from '@paymanai/payman-ts';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -36,25 +37,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     console.log('Initializing PaymanClient with auth code...');
     
-    const { PaymanClient } = await import('@paymanai/payman-ts');
-
-    const client = PaymanClient.withAuthCode(
-      {
-        clientId,
-        clientSecret,
-      },
-      code
-    );
+    const client = new PaymanClient({
+      clientId,
+      clientSecret,
+      authorizationCode: code,
+      redirectUri,
+      environment: 'test'
+    });
 
     console.log('Calling getAccessToken...');
     const tokenResponse = await client.getAccessToken();
     console.log('Token response received:', { 
-      hasAccessToken: !!tokenResponse?.accessToken, 
+      hasAccessToken: !!tokenResponse?.access_token, 
       tokenType: tokenResponse?.token_type,
-      expiresIn: tokenResponse?.expiresIn,
+      expiresIn: tokenResponse?.expires_in,
     });
 
-    if (!tokenResponse || !tokenResponse.accessToken) {
+    if (!tokenResponse || !tokenResponse.access_token) {
       console.error("Invalid token response from Payman:", tokenResponse);
       return res.status(500).json({ error: "Invalid token response from Payman" });
     }
@@ -63,9 +62,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     res.json({
       success: true,
-      access_token: tokenResponse.accessToken,
+      access_token: tokenResponse.access_token,
       token_type: tokenResponse.token_type,
-      expires_in: tokenResponse.expiresIn,
+      expires_in: tokenResponse.expires_in,
     });
   } catch (error: unknown) {
     const errorObj = error instanceof Error ? {
