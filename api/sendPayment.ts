@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import payman from '../src/lib/payman-server.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -14,21 +15,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } = req.body;
 
   try {
-    // Use dynamic import for better ES module compatibility
-    const { PaymanClient } = await import('@paymanai/payman-ts');
-    
-    const clientId = process.env.PAYMAN_CLIENT_ID as string;
-    const clientSecret = process.env.PAYMAN_CLIENT_SECRET as string;
-    
-    if (!clientId || !clientSecret) {
-      return res.status(500).json({ error: 'Server configuration error: Missing Payman credentials' });
-    }
-    
-    const payman = PaymanClient.withCredentials({
-      clientId,
-      clientSecret,
-    });
-    
     const prompt = `Send ${amount} ${token_symbol} from wallet on chain ${chain_id} to ${recipient_wallet_address}`;
     const result = await payman.ask(prompt, {
       metadata: {

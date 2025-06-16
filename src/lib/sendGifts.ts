@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
+// @ts-expect-error - payman-server.js doesn't have type declarations
+import payman from './payman-server';
 
 const supabase = createClient(
       process.env.VITE_SUPABASE_URL!,
@@ -29,21 +31,6 @@ async function sendGiftsForToday() {
   if (error) throw error;
 
   const birthdayContacts = (contacts as Contact[]).filter((c: Contact) => c.birthday === mmdd);
-
-  // Use dynamic import for better ES module compatibility
-  const { PaymanClient } = await import('@paymanai/payman-ts');
-  
-  const clientId = process.env.PAYMAN_CLIENT_ID as string;
-  const clientSecret = process.env.PAYMAN_CLIENT_SECRET as string;
-  
-  if (!clientId || !clientSecret) {
-    throw new Error('Missing Payman credentials in environment variables');
-  }
-  
-  const payman = PaymanClient.withCredentials({
-    clientId,
-    clientSecret,
-  });
 
   for (const contact of birthdayContacts) {
     // Prepare payment details
