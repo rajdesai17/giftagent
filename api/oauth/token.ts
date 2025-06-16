@@ -1,8 +1,4 @@
-import { PaymanClient } from '@paymanai/payman-ts';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-
-// Correct the import path to be relative to the 'api' directory
-import { client } from '../payman-wrapper.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   console.log('OAuth token endpoint called. Method:', req.method);
@@ -40,23 +36,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     console.log('Initializing PaymanClient with auth code...');
     
-    const client = new PaymanClient({
-      clientId,
-      clientSecret,
-      authorizationCode: code,
-      redirectUri,
-      environment: 'test'
-    });
+    const { PaymanClient } = await import('@paymanai/payman-ts');
+
+    const client = PaymanClient.withAuthCode(
+      {
+        clientId,
+        clientSecret,
+      },
+      code
+    );
 
     console.log('Calling getAccessToken...');
     const tokenResponse = await client.getAccessToken();
     console.log('Token response received:', { 
-      hasAccessToken: !!tokenResponse?.access_token, 
+      hasAccessToken: !!tokenResponse?.accessToken, 
       tokenType: tokenResponse?.token_type,
-      expiresIn: tokenResponse?.expires_in,
+      expiresIn: tokenResponse?.expiresIn,
     });
 
-    if (!tokenResponse || !tokenResponse.access_token) {
+    if (!tokenResponse || !tokenResponse.accessToken) {
       console.error("Invalid token response from Payman:", tokenResponse);
       return res.status(500).json({ error: "Invalid token response from Payman" });
     }
@@ -65,9 +63,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     res.json({
       success: true,
-      access_token: tokenResponse.access_token,
+      access_token: tokenResponse.accessToken,
       token_type: tokenResponse.token_type,
-      expires_in: tokenResponse.expires_in,
+      expires_in: tokenResponse.expiresIn,
     });
   } catch (error: unknown) {
     const errorObj = error instanceof Error ? {
