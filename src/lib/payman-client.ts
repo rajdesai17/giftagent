@@ -1,4 +1,4 @@
-import { PaymanClient } from '@paymanai/payman-ts';
+import * as Payman from '@paymanai/payman-ts';
 
 interface PaymanTokenData {
   accessToken: string;
@@ -9,7 +9,7 @@ interface PaymanTokenData {
  * Get an authenticated PaymanClient instance using stored OAuth token
  * Returns null if no valid token is available
  */
-export function getAuthenticatedPaymanClient(): PaymanClient | null {
+export function getAuthenticatedPaymanClient(): Payman.PaymanClient | null {
   try {
     const tokenDataString = localStorage.getItem('payman_token');
     if (!tokenDataString) {
@@ -28,7 +28,7 @@ export function getAuthenticatedPaymanClient(): PaymanClient | null {
     }
 
     // Create authenticated client as per documentation
-    return PaymanClient.withToken(clientId, {
+    return Payman.PaymanClient.withToken(clientId, {
       accessToken: tokenData.accessToken,
       expiresIn: tokenData.expiresIn,
     });
@@ -64,7 +64,7 @@ export function clearPaymanToken(): void {
  * Get client credentials PaymanClient for server-side operations
  * This should only be used in API routes, not in frontend code
  */
-export function getServerPaymanClient(): PaymanClient {
+export function getServerPaymanClient(): Payman.PaymanClient {
   const clientId = process.env.VITE_PAYMAN_CLIENT_ID;
   const clientSecret = process.env.VITE_PAYMAN_CLIENT_SECRET;
 
@@ -72,7 +72,7 @@ export function getServerPaymanClient(): PaymanClient {
     throw new Error('Missing Payman client credentials in environment variables');
   }
 
-  return PaymanClient.withClientCredentials({
+  return Payman.PaymanClient.withClientCredentials({
     clientId,
     clientSecret,
   });
