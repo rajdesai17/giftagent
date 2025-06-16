@@ -59,9 +59,8 @@ export default function Dashboard() {
   const exchangeCodeForToken = async (code: string) => {
     console.log('Dashboard: Exchanging code for token...', { codeLength: code.length, codePreview: code.substring(0, 20) + '...' });
     try {
-      // Include the redirectUri that matches what was used in the OAuth flow
-      const redirectUri = `${window.location.origin}/oauth-callback`;
-      const requestBody = { code, redirectUri };
+      // Follow official docs pattern - only send code
+      const requestBody = { code };
       console.log('Dashboard: Sending request to /api/oauth/token with:', requestBody);
       
       const response = await fetch('/api/oauth/token', {
@@ -79,9 +78,9 @@ export default function Dashboard() {
       }
 
       const responseData = await response.json();
-      console.log('Dashboard: Token exchange successful:', { hasAccessToken: !!responseData.access_token, expiresIn: responseData.expires_in });
+      console.log('Dashboard: Token exchange successful:', { hasAccessToken: !!responseData.accessToken, expiresIn: responseData.expiresIn });
       
-      const { access_token: accessToken, expires_in: expiresIn } = responseData;
+      const { accessToken, expiresIn } = responseData;
       if (!accessToken) {
         throw new Error('No access token in response.');
       }

@@ -71,8 +71,7 @@ export function getServerPaymanClient(): Payman.PaymanClient {
   if (!clientId || !clientSecret) {
     throw new Error('Missing Payman client credentials in environment variables');
   }
-
-  return Payman.PaymanClient.withClientCredentials({
+  return Payman.PaymanClient.withCredentials({
     clientId,
     clientSecret,
   });

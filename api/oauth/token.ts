@@ -8,15 +8,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   
   try {
-    const { code, redirectUri } = req.body;
+    // Extract code from request body (official docs pattern)
+    const { code } = req.body;
     console.log('Received authorization code:', code ? `${code.substring(0, 20)}...` : 'undefined');
     
-    if (!code || !redirectUri) {
-      console.error('No authorization code or redirectUri provided in request body');
-      return res.status(400).json({ error: 'Authorization code and redirectUri are required' });
+    if (!code) {
+      console.error('No authorization code provided in request body');
+      return res.status(400).json({ error: 'Authorization code is required' });
     }
     
-    // On Vercel, server-side environment variables should not have the VITE_ prefix.
+    // On Vercel, server-side environment variables should not have the VITE_ prefix
     const clientId = process.env.PAYMAN_CLIENT_ID as string;
     const clientSecret = process.env.PAYMAN_CLIENT_SECRET as string;
     
@@ -34,39 +35,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: "Server configuration error: Missing Payman credentials." });
     }
 
-    console.log('Initializing PaymanClient with auth code...');
+    console.log('Creating PaymanClient with auth code (official method)...');
     
     // Use dynamic import for ES module compatibility
     const { PaymanClient } = await import('@paymanai/payman-ts');
     
-    const client = new PaymanClient({
-      clientId,
-      clientSecret,
-      authorizationCode: code,
-      redirectUri,
-      environment: 'test'
-    });
+    // Follow official docs: PaymanClient.withAuthCode()
+    const client = PaymanClient.withAuthCode(
+      {
+        clientId,
+        clientSecret,
+      },
+      code
+    );
 
     console.log('Calling getAccessToken...');
     const tokenResponse = await client.getAccessToken();
     console.log('Token response received:', { 
-      hasAccessToken: !!tokenResponse?.access_token, 
-      tokenType: tokenResponse?.token_type,
-      expiresIn: tokenResponse?.expires_in,
+      hasAccessToken: !!tokenResponse?.accessToken, 
+      expiresIn: tokenResponse?.expiresIn,
     });
 
-    if (!tokenResponse || !tokenResponse.access_token) {
+    if (!tokenResponse || !tokenResponse.accessToken) {
       console.error("Invalid token response from Payman:", tokenResponse);
       return res.status(500).json({ error: "Invalid token response from Payman" });
     }
 
     console.log('Token exchange successful, returning token to frontend.');
 
+    // Follow official docs response format
     res.json({
-      success: true,
-      access_token: tokenResponse.access_token,
-      token_type: tokenResponse.token_type,
-      expires_in: tokenResponse.expires_in,
+      accessToken: tokenResponse.accessToken,
+      expiresIn: tokenResponse.expiresIn,
     });
   } catch (error: unknown) {
     const errorObj = error instanceof Error ? {
