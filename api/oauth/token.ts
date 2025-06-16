@@ -1,4 +1,8 @@
+import { PaymanClient } from '@paymanai/payman-ts';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+// Correct the import path to be relative to the 'api' directory
+import { client } from '../payman-wrapper.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   console.log('OAuth token endpoint called. Method:', req.method);
@@ -35,9 +39,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     
     console.log('Initializing PaymanClient with auth code...');
-    
-    // Use dynamic import for ES module compatibility
-    const { PaymanClient } = await import('@paymanai/payman-ts');
     
     const client = new PaymanClient({
       clientId,
@@ -82,4 +83,4 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       details: error instanceof Error ? error.message : String(error)
     });
   }
-} 
+}
