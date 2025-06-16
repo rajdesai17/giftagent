@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Gift, CheckCircle } from 'lucide-react';
+import { Send, Bot, User, CheckCircle, AlertCircle } from 'lucide-react';
 import { useApp, gifts } from '../context/AppContext';
-import { useAuth } from '../context/AuthContext';
-import payman from '../lib/payman';
-import { PaymanClient } from '@paymanai/payman-ts';
+import { getAuthenticatedPaymanClient, isPaymanConnected } from '../lib/payman-client';
 
 interface Message {
   id: string;
@@ -19,19 +17,41 @@ interface Message {
 }
 
 export default function ChatAgent() {
-  const { user } = useAuth();
   const { contacts, addTransaction, showToast } = useApp();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      type: 'agent',
-      content: "Hi! I'm your gift agent. You can tell me to send gifts to your contacts like 'send wireless headphones to Sarah' and I'll handle the purchase and delivery instantly! 🎁",
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Initialize messages based on connection status
+  useEffect(() => {
+    const initializeMessages = () => {
+      const connected = isPaymanConnected();
+      setMessages([{
+        id: '1',
+        type: 'agent',
+        content: connected 
+          ? "Hi! I'm your gift agent. You can tell me to send gifts to your contacts like 'send wireless headphones to Sarah' and I'll handle the purchase and delivery instantly! 🎁"
+          : "Hi! I'm your gift agent. Please connect your Payman account first using the button above, then you can tell me to send gifts like 'send wireless headphones to Sarah'! 🎁",
+        timestamp: new Date()
+      }]);
+    };
+
+    initializeMessages();
+
+    // Listen for connection status changes
+    const handleStorageChange = () => {
+      initializeMessages();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('focus', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('focus', handleStorageChange);
+    };
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -58,11 +78,40 @@ export default function ChatAgent() {
     );
   };
 
-  const generateTransactionId = () => {
-    return `PM-${Math.floor(Math.random() * 9000000) + 1000000}`;
-  };
-
   const processGiftCommand = async (message: string) => {
+    // Check if Payman is connected
+    if (!isPaymanConnected()) {
+      return {
+        success: false,
+        response: "Please connect your Payman account first using the 'Connect Payman' button above. Once connected, I'll be able to send real payments! 💳"
+      };
+    }
+
+    // Handle test connection command
+    if (message.toLowerCase().includes('test connection') || message.toLowerCase().includes('test payman')) {
+      try {
+        const paymanClient = getAuthenticatedPaymanClient();
+        if (!paymanClient) {
+          return {
+            success: false,
+            response: "Your Payman session has expired. Please reconnect your account using the button above."
+          };
+        }
+
+        const balanceResponse = await paymanClient.ask("what's my wallet balance?");
+        return {
+          success: true,
+          response: `✅ Payman connection test successful! Your wallet info: ${balanceResponse}`
+        };
+              } catch (error) {
+          console.error('Connection test failed:', error);
+          return {
+            success: false,
+            response: `❌ Connection test failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+          };
+        }
+    }
+
     // Parse the message for gift sending commands
     const sendPattern = /send\s+(.+?)\s+to\s+(.+)/i;
     const match = message.match(sendPattern);
@@ -70,7 +119,7 @@ export default function ChatAgent() {
     if (!match) {
       return {
         success: false,
-        response: "I didn't understand that. Try saying something like 'send wireless headphones to Sarah' or 'send coffee beans to Mike'."
+        response: "I didn't understand that. Try saying something like 'send wireless headphones to Sarah', 'send coffee beans to Mike', or 'test connection' to verify your Payman setup."
       };
     }
 
@@ -98,34 +147,34 @@ export default function ChatAgent() {
       };
     }
 
-    // Real Payman payment logic using API route
+    // Use authenticated Payman client for user-specific operations
     try {
-      const TO_WALLET_ID = 'pd-1f048707-53da-6908-a779-972e0be1d5f8';
-      const response = await fetch('/api/sendPayment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          toWalletId: TO_WALLET_ID,
-          amount: gift.price,
-          description: `Birthday gift for ${contact.name}`,
-          metadata: { contactId: contact.id, giftId: gift.id }
-        })
-      });
-      const result = await response.json();
-      if (!result.success) throw new Error(result.error);
-      const payment = result.payment;
+      const paymanClient = getAuthenticatedPaymanClient();
+      if (!paymanClient) {
+        return {
+          success: false,
+          response: "Your Payman session has expired. Please reconnect your account using the button above."
+        };
+      }
 
+      // Use the existing test payee instead of creating new ones
+      const TEST_PAYEE_ID = 'pd-1f048707-53da-6908-a779-972e0be1d5f8';
+      const paymentPrompt = `Send ${gift.price} TSD to payee ${TEST_PAYEE_ID}. Description: Birthday gift for ${contact.name} - ${gift.name}`;
+      
+      await paymanClient.ask(paymentPrompt);
+      
+      // Add transaction to our database
       await addTransaction({
         recipientName: contact.name,
         gift: gift,
         status: 'paid',
         transactionDate: new Date().toISOString(),
-        paymanId: payment.id
+        paymanId: `payment-${Date.now()}` // In real implementation, extract from paymentResponse
       });
 
       return {
         success: true,
-        response: `Perfect! I've sent ${gift.name} (${gift.price} TSD) to ${contact.name} at ${contact.address}. Payment processed and the gift is on its way! 🎉`,
+        response: `Perfect! I've sent ${gift.name} (${gift.price} TSD) to ${contact.name} via Payman. Payment processed and the gift is on its way! 🎉`,
         giftSent: {
           giftName: gift.name,
           recipientName: contact.name,
@@ -136,7 +185,7 @@ export default function ChatAgent() {
       console.error('Payman payment error:', error);
       return {
         success: false,
-        response: "Sorry, there was an error processing the payment. Please try again."
+        response: "Sorry, there was an error processing the payment. Please check your Payman wallet balance or try again."
       };
     }
   };
@@ -186,13 +235,30 @@ export default function ChatAgent() {
   return (
     <div className="bg-white rounded-3xl border border-gray-100 h-[600px] flex flex-col">
       {/* Chat Header */}
-      <div className="flex items-center space-x-3 p-6 border-b border-gray-100">
-        <div className="bg-gray-900 p-2 rounded-2xl">
-          <Bot className="h-5 w-5 text-white" />
+      <div className="flex items-center justify-between p-6 border-b border-gray-100">
+        <div className="flex items-center space-x-3">
+          <div className="bg-gray-900 p-2 rounded-2xl">
+            <Bot className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h3 className="font-medium text-gray-900">Gift Agent</h3>
+            <p className="text-sm text-gray-600">Your personal gift assistant</p>
+          </div>
         </div>
-        <div>
-          <h3 className="font-medium text-gray-900">Gift Agent</h3>
-          <p className="text-sm text-gray-600">Your personal gift assistant</p>
+        
+        {/* Connection Status */}
+        <div className="flex items-center space-x-2">
+          {isPaymanConnected() ? (
+            <div className="flex items-center space-x-2 text-green-600 bg-green-50 px-3 py-1 rounded-full">
+              <CheckCircle className="h-4 w-4" />
+              <span className="text-sm font-medium">Connected</span>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2 text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
+              <AlertCircle className="h-4 w-4" />
+              <span className="text-sm font-medium">Connect Payman</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -270,19 +336,25 @@ export default function ChatAgent() {
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Try: 'send wireless headphones to Sarah'"
-            className="flex-1 px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
+            placeholder={isPaymanConnected() ? "Try: 'send wireless headphones to Sarah' or 'test connection'" : "Connect Payman first to send gifts"}
+            disabled={!isPaymanConnected()}
+            className={`flex-1 px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all ${
+              !isPaymanConnected() ? 'bg-gray-50 text-gray-400' : ''
+            }`}
           />
           <button
             onClick={handleSendMessage}
-            disabled={!inputMessage.trim() || isTyping}
+            disabled={!inputMessage.trim() || isTyping || !isPaymanConnected()}
             className="bg-gray-900 text-white p-3 rounded-2xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             <Send className="h-5 w-5" />
           </button>
         </div>
         <p className="text-xs text-gray-500 mt-2">
-          Example: "send coffee beans to Mike" or "send blanket to Emma"
+          {isPaymanConnected() 
+            ? 'Example: "send coffee beans to Mike", "send blanket to Emma", or "test connection"'
+            : 'Connect your Payman account above to start sending gifts'
+          }
         </p>
       </div>
     </div>

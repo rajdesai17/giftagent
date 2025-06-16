@@ -5,6 +5,7 @@ import { AppProvider } from './context/AppContext';
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import History from './pages/History';
+import OAuthCallback from './pages/oauth-callback';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import './index.css';
@@ -16,6 +17,7 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/oauth-callback" element={<OAuthCallback />} />
             <Route 
               path="/dashboard" 
               element={

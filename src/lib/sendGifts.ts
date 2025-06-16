@@ -1,12 +1,23 @@
 import { createClient } from '@supabase/supabase-js';
-import payman from './payman';
+// @ts-expect-error - payman-server.js doesn't have type declarations
+import payman from './payman-server';
 
 const supabase = createClient(
       process.env.VITE_SUPABASE_URL!,
       process.env.VITE_SUPABASE_ANON_KEY!
 );
 
-const FROM_WALLET_ID = process.env.VITE_FROM_WALLET_ID!;
+interface Contact {
+  id: string;
+  user_id: string;
+  name: string;
+  birthday: string;
+  gift_id: string;
+  gift_name: string;
+  gift_price: number;
+  gift_image: string;
+  gift_category: string;
+}
 
 async function sendGiftsForToday() {
   // Get today's MM-DD
@@ -19,20 +30,16 @@ async function sendGiftsForToday() {
     .select('*');
   if (error) throw error;
 
-  const birthdayContacts = contacts.filter((c: any) => c.birthday === mmdd);
+  const birthdayContacts = (contacts as Contact[]).filter((c: Contact) => c.birthday === mmdd);
 
   for (const contact of birthdayContacts) {
     // Prepare payment details
     const amount = contact.gift_price;
-    const toWalletId = 'pd-1f048707-53da-6908-a779-972e0be1d5f8'; // Fixed recipient wallet ID
-    const payment = await payman.payments.create({
-      fromWalletId: FROM_WALLET_ID,
-      toWalletId,
-      amount,
-      currency: 'TSD',
-      description: `Birthday gift for ${contact.name}`,
-      metadata: { contactId: contact.id, giftId: contact.gift_id }
-    });
+    const toPayeeId = 'pd-1f048707-53da-6908-a779-972e0be1d5f8'; // Fixed test payee ID
+    
+    // Use the new Payman client with ask() method
+    const paymentPrompt = `Send ${amount} TSD to payee ${toPayeeId}. Description: Birthday gift for ${contact.name}`;
+    await payman.ask(paymentPrompt);
 
     // Log transaction in Supabase
     await supabase.from('transactions').insert({
@@ -45,7 +52,7 @@ async function sendGiftsForToday() {
       gift_category: contact.gift_category,
       status: 'paid',
       transaction_date: today.toISOString(),
-      payman_id: payment.id,
+      payman_id: `auto-${Date.now()}`, // Since we can't extract ID from ask() response
     });
   }
 
