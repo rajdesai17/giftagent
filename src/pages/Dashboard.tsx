@@ -97,7 +97,7 @@ export default function Dashboard() {
     }
   };
 
-  // Simple OAuth script injection
+  // OAuth script injection
   useEffect(() => {
     if (paymanConnected) {
       // Cleanup script if user is connected
@@ -113,7 +113,12 @@ export default function Dashboard() {
 
     const clientId = import.meta.env.VITE_PAYMAN_CLIENT_ID;
     if (!clientId) {
-      console.error('Missing VITE_PAYMAN_CLIENT_ID');
+      console.error('Missing VITE_PAYMAN_CLIENT_ID from .env file');
+      // To provide better feedback to the user, you could render a message in the UI
+      const container = document.getElementById('payman-connect');
+      if (container) {
+        container.innerHTML = '<p class="text-red-500">Configuration error: Payman Client ID is missing.</p>';
+      }
       return;
     }
 
@@ -121,16 +126,21 @@ export default function Dashboard() {
     script.src = 'https://app.paymanai.com/js/pm.js';
     script.setAttribute('data-client-id', clientId);
     script.setAttribute('data-scopes', 'read_balance,read_list_wallets,read_list_payees,read_list_transactions,write_create_payee,write_send_payment,write_create_wallet');
-    script.setAttribute('data-redirect-uri', 
-      window.location.hostname === 'localhost'
-        ? 'http://localhost:5173/oauth-callback'
-        : 'https://giftagent.vercel.app/oauth-callback'
-    );
+    // Use a dynamic redirect URI for portability between local, preview, and production
+    script.setAttribute('data-redirect-uri', `${window.location.origin}/oauth-callback`);
     script.setAttribute('data-target', '#payman-connect');
     script.setAttribute('data-dark-mode', 'false');
     script.setAttribute('data-styles', '{"borderRadius": "8px", "fontSize": "14px"}');
 
     document.head.appendChild(script);
+
+    // Add a cleanup function to remove the script when the component unmounts
+    return () => {
+        const scriptInHead = document.querySelector(`script[src="${script.src}"]`);
+        if(scriptInHead) {
+            document.head.removeChild(scriptInHead);
+        }
+    }
   }, [paymanConnected]);
 
   return (
