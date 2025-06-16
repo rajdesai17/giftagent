@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { PaymanClient } from '@paymanai/payman-ts';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   console.log('OAuth token endpoint called. Method:', req.method);
@@ -36,22 +37,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     console.log('Initializing PaymanClient with auth code...');
     
-    // Dynamic import with CommonJS fallback for Vercel compatibility
-    const loadPaymanClient = async () => {
-      try {
-        // Try dynamic import first
-        const module = await import('@paymanai/payman-ts');
-        return module.PaymanClient || module.default?.PaymanClient || module;
-      } catch (importError) {
-        console.error('Dynamic import failed, trying eval require:', importError);
-        // Fallback using eval to bypass linter
-        const requireFunc = eval('require');
-        const module = requireFunc('@paymanai/payman-ts');
-        return module.PaymanClient || module.default?.PaymanClient || module;
-      }
-    };
-    
-    const PaymanClient = await loadPaymanClient();
     const client = PaymanClient.withAuthCode(
       {
         clientId,

@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { PaymanClient } from '@paymanai/payman-ts';
 
 // Define an interface for the expected structure of the response from the .ask() call.
 // We only care about the payeeId for now.
@@ -28,20 +29,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       accessToken: token,
       expiresIn: 3600,
     };
-    // Dynamic import with CommonJS fallback for Vercel compatibility
-    const loadPaymanClient = async () => {
-      try {
-        const module = await import('@paymanai/payman-ts');
-        return module.PaymanClient || module.default?.PaymanClient || module;
-      } catch (importError) {
-        console.error('Dynamic import failed, trying eval require:', importError);
-        const requireFunc = eval('require');
-        const module = requireFunc('@paymanai/payman-ts');
-        return module.PaymanClient || module.default?.PaymanClient || module;
-      }
-    };
-    
-    const PaymanClient = await loadPaymanClient();
     const client = PaymanClient.withToken(clientId, tokenObject);
 
     const creationPrompt = `Create a new payee named "${name}" with the address "${address}"`;

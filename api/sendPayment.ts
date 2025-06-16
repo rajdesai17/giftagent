@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import payman from '../src/lib/payman-server.js';
+import payman from '../src/lib/payman-server';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -16,8 +16,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const prompt = `Send ${amount} ${token_symbol} from wallet on chain ${chain_id} to ${recipient_wallet_address}`;
-    const paymanClient = await payman; // Wait for the client promise
-    const result = await paymanClient.ask(prompt, {
+    const result = await payman.ask(prompt, {
       metadata: {
         token_address: token_address,
       }
