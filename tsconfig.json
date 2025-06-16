@@ -1,24 +1,11 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-
-    /* Bundler mode */
-    "moduleResolution": "Node",
-    "allowSyntheticDefaultImports": true,
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
-  },
-  "include": ["src", "api", "vite.config.ts"]
+  // Solution-style tsconfig to manage different build requirements
+  // for the frontend app and the backend API.
+  "files": [],
+  "references": [
+    // Linting/dev configuration for the Vite frontend
+    { "path": "./tsconfig.app.json" },
+    // Build configuration for the Vercel API functions
+    { "path": "./tsconfig.api.json" }
+  ]
 }

@@ -1,19 +1,16 @@
 {
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ESNext"],
     "module": "ESNext",
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
     "resolveJsonModule": true,
-    "outDir": "./dist",
-    "rootDir": "."
+    // Vercel handles the output, so we don't need to specify an outDir.
+    "noEmit": true
   },
-  "include": [
-    "**/*.ts"
-  ]
+  "include": ["api"]
 } 
