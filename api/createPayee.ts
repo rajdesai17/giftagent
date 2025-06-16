@@ -1,4 +1,3 @@
-import { PaymanClient } from '@paymanai/payman-ts';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Define an interface for the expected structure of the response from the .ask() call.
@@ -25,6 +24,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // Use dynamic import for better ES module compatibility
+    const { PaymanClient } = await import('@paymanai/payman-ts');
+    
     const tokenObject = {
       accessToken: token,
       expiresIn: 3600,

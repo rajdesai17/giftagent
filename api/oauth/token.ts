@@ -1,4 +1,3 @@
-import { PaymanClient } from '@paymanai/payman-ts';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -9,6 +8,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   
   try {
+    // Use dynamic import for better ES module compatibility
+    const { PaymanClient } = await import('@paymanai/payman-ts');
+    
     const { code } = req.body;
     console.log('Received authorization code:', code ? `${code.substring(0, 20)}...` : 'undefined');
     
