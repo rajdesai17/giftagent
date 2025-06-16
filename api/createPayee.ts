@@ -24,8 +24,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Use dynamic import for ES module compatibility
-    const { PaymanClient } = await import('@paymanai/payman-ts');
+    // Use CommonJS wrapper to avoid ES module issues
+    const { createPaymanClient } = eval('require')('../payman-wrapper.js');
+    const PaymanClient = createPaymanClient();
     
     const tokenObject = {
       accessToken: token,
