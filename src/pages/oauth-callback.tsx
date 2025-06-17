@@ -6,25 +6,13 @@ export default function OAuthCallback() {
     // Its sole job is to send its full URL (containing the auth code)
     // to the main window that opened it, and then close itself.
     
-    const broadcastAndClose = () => {
-      // Ensure there's an opener window
-      if (window.opener) {
-        console.log('OAuth Popup: Sending redirect URI to opener window.');
-        window.opener.postMessage({
-          type: 'payman-oauth-redirect',
-          redirectUri: window.location.href,
-        }, window.location.origin); // Post to the same origin
-      } else {
-        console.error('OAuth Popup: No opener window found. This page should be opened as a popup.');
-      }
-
-      // Close the popup window
-      // Note: This might not work in all browsers if the window was not opened by a script.
-      window.close();
-    };
-
-    broadcastAndClose();
-
+    if (window.opener) {
+      window.opener.postMessage({
+        type: 'payman-oauth-redirect',
+        redirectUri: window.location.href,
+      }, window.location.origin);
+    }
+    window.close();
   }, []);
 
   return (
