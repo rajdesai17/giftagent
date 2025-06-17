@@ -13,5 +13,11 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "installCommand": "npm install",
-  "regions": ["bom1"]
+  "regions": ["bom1"],
+  "crons": [
+    {
+      "path": "/api/cron/check-birthdays",
+      "schedule": "0 0 * * *"
+    }
+  ]
 } 
