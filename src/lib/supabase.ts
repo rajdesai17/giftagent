@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { config } from './config';
 
 // Check if we're in an edge function environment
 const isEdgeRuntime = typeof process !== 'undefined' && process.env.EDGE_RUNTIME === '1';
@@ -20,4 +21,4 @@ if (!supabaseAnonKey) {
   throw new Error("SUPABASE_ANON_KEY is not defined. Please check your environment variables.");
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(config.supabaseUrl, config.supabaseAnonKey);

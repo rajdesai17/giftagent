@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 import paymanClient from './payman';
 import { format } from 'date-fns';
+import { config } from './config';
 
 interface BirthdayContact {
   id: string;
@@ -40,11 +41,7 @@ export async function checkAndSendBirthdayGifts() {
         // If contact has a preferred gift, use it
         if (contact.gift_id && contact.gift_price) {
           // Send payment to store
-          const storePaytag = isEdgeRuntime 
-            ? process.env.STORE_PAYTAG
-            : import.meta.env.VITE_STORE_PAYTAG;
-
-          if (!storePaytag) throw new Error('Store Paytag not configured');
+          const storePaytag = config.storePaytag;
 
           await paymanClient.ask(
             `send $${contact.gift_price} to ${storePaytag} for ${contact.gift_name} (Birthday Gift for ${contact.name})`
