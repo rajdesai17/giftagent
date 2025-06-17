@@ -16,6 +16,9 @@ interface BirthdayContact {
   gift_category?: string;
 }
 
+// Check if we're in an edge function environment
+const isEdgeRuntime = typeof process !== 'undefined' && process.env.EDGE_RUNTIME === '1';
+
 export async function checkAndSendBirthdayGifts() {
   try {
     // Get today's date in MM-DD format
@@ -37,7 +40,10 @@ export async function checkAndSendBirthdayGifts() {
         // If contact has a preferred gift, use it
         if (contact.gift_id && contact.gift_price) {
           // Send payment to store
-          const storePaytag = process.env.VITE_STORE_PAYTAG;
+          const storePaytag = isEdgeRuntime 
+            ? process.env.STORE_PAYTAG
+            : import.meta.env.VITE_STORE_PAYTAG;
+
           if (!storePaytag) throw new Error('Store Paytag not configured');
 
           await paymanClient.ask(
