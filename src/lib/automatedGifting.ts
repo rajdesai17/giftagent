@@ -35,14 +35,15 @@ export async function checkAndSendBirthdayGifts() {
     
     console.log(`Found ${birthdayContacts?.length || 0} birthdays today`);
 
+    const storePaytag = config.storePaytag || config.STORE_PAYTAG;
+    if (!storePaytag) throw new Error('Store Paytag not configured');
+
     // Process each birthday contact
     for (const contact of birthdayContacts || []) {
       try {
         // If contact has a preferred gift, use it
         if (contact.gift_id && contact.gift_price) {
           // Send payment to store
-          const storePaytag = config.storePaytag;
-
           await paymanClient.ask(
             `send $${contact.gift_price} to ${storePaytag} for ${contact.gift_name} (Birthday Gift for ${contact.name})`
           );

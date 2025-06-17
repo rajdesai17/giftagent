@@ -1,10 +1,16 @@
-import { PaymanClient, Environment } from '@paymanai/payman-ts';
+import { PaymanClient } from '@paymanai/payman-ts';
 import { config } from './config';
 
+const clientId = config.paymanClientId || config.PAYMAN_CLIENT_ID;
+const clientSecret = config.paymanClientSecret || config.PAYMAN_CLIENT_SECRET;
+
+if (!clientId || !clientSecret) {
+  throw new Error('Payman credentials are missing in environment variables.');
+}
+
 const paymanClient = PaymanClient.withCredentials({
-  clientId: config.paymanClientId,
-  clientSecret: config.paymanClientSecret,
-  environment: config.paymanEnvironment as Environment
+  clientId,
+  clientSecret,
 });
 
 export default paymanClient;

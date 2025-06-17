@@ -1,25 +1,25 @@
 // Helper to get environment variables in a unified way
-function getEnvVar(name: string): string {
-  // For edge functions
-  if (typeof process !== 'undefined' && process.env) {
-    const value = process.env[name] || process.env[`VITE_${name}`];
-    if (value) return value;
+function getEnv(name: string): string {
+  // Edge runtime
+  if (typeof process !== 'undefined') {
+    return process.env[name] ?? '';
   }
-
-  // For browser/Vite environment
-  if (typeof import.meta !== 'undefined' && import.meta.env) {
-    const value = import.meta.env[`VITE_${name}`];
-    if (value) return value;
-  }
-
-  throw new Error(`Environment variable ${name} is not defined`);
+  // Vite/browser runtime
+  return (import.meta.env[name] as string) ?? '';
 }
 
 export const config = {
-  supabaseUrl: getEnvVar('SUPABASE_URL'),
-  supabaseAnonKey: getEnvVar('SUPABASE_ANON_KEY'),
-  storePaytag: getEnvVar('STORE_PAYTAG'),
-  paymanClientId: getEnvVar('PAYMAN_CLIENT_ID'),
-  paymanClientSecret: getEnvVar('PAYMAN_CLIENT_SECRET'),
-  paymanEnvironment: getEnvVar('PAYMAN_ENVIRONMENT')
-} as const; 
+  supabaseUrl: getEnv('VITE_SUPABASE_URL'),
+  supabaseAnonKey: getEnv('VITE_SUPABASE_ANON_KEY'),
+  storePaytag: getEnv('VITE_STORE_PAYTAG'),
+  paymanClientId: getEnv('VITE_PAYMAN_CLIENT_ID'),
+  paymanClientSecret: getEnv('VITE_PAYMAN_CLIENT_SECRET'),
+  paymanEnvironment: getEnv('VITE_PAYMAN_ENVIRONMENT'),
+  // Add non-VITE prefixed versions for the edge
+  SUPABASE_URL: getEnv('SUPABASE_URL'),
+  SUPABASE_ANON_KEY: getEnv('SUPABASE_ANON_KEY'),
+  STORE_PAYTAG: getEnv('STORE_PAYTAG'),
+  PAYMAN_CLIENT_ID: getEnv('PAYMAN_CLIENT_ID'),
+  PAYMAN_CLIENT_SECRET: getEnv('PAYMAN_CLIENT_SECRET'),
+  PAYMAN_ENVIRONMENT: getEnv('PAYMAN_ENVIRONMENT'),
+}; 
