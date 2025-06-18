@@ -140,90 +140,90 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <DashboardNav onChatClick={() => setShowChat(true)} />
-          </div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Sidebar */}
+        <div className="lg:col-span-1">
+          <DashboardNav onChatClick={() => setShowChat(true)} />
+        </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Contact Dashboard</h1>
-                <p className="text-gray-600">Schedule and track birthday gifts for your friends.</p>
-              </div>
-              <div className="flex space-x-3">
-                <Button
-                  variant="primary"
-                  icon={MessageCircle}
-                  onClick={() => setShowChat(true)}
-                >
-                  Chat with GiftAgent
-                </Button>
-                <Button 
-                  variant="secondary" 
-                  icon={Plus}
-                  onClick={() => setShowAddContact(true)}
-                >
-                  Add Contact
-                </Button>
-              </div>
+        {/* Main Content */}
+        <div className="lg:col-span-3 space-y-6">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Contact Dashboard</h1>
+              <p className="text-gray-600">Schedule and track birthday gifts for your friends.</p>
             </div>
-
-            {/* Payman Connection */}
-            {paymanAccessToken ? (
-              <Card className="p-4 bg-green-50 border-green-200">
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <div>
-                    <p className="text-sm font-medium text-green-800">
-                      Payman Connected
-                    </p>
-                    <p className="text-xs text-green-600">
-                      You can now send gifts via the chat agent.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            ) : (
-              <PaymanConnect />
-            )}
-
-            {/* Contacts Grid */}
-            {contacts.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {contacts.map((contact) => (
-                  <ContactCard
-                    key={contact.id}
-                    contact={contact}
-                    onEdit={handleEditContact}
-                    onDelete={handleDeleteContact}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-20 bg-white rounded-lg border-2 border-dashed border-gray-200">
-                <div className="flex justify-center mb-4">
-                  <div className="p-3 bg-gray-100 rounded-full">
-                    <Users className="w-8 h-8 text-gray-400" />
-                  </div>
-                </div>
-                <h3 className="font-semibold text-gray-800 mb-2">No Contacts Found</h3>
-                <p className="text-gray-500 mb-6">Add a contact to get started with automated gifting.</p>
-                <Button 
-                  variant="primary" 
-                  icon={Plus}
-                  onClick={() => setShowAddContact(true)}
-                >
-                  Add Your First Contact
-                </Button>
-              </div>
-            )}
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+              <Button
+                variant="primary"
+                icon={MessageCircle}
+                onClick={() => setShowChat(true)}
+                className="w-full sm:w-auto"
+              >
+                Chat with GiftAgent
+              </Button>
+              <Button 
+                variant="secondary" 
+                icon={Plus}
+                onClick={() => setShowAddContact(true)}
+                className="w-full sm:w-auto"
+              >
+                Add Contact
+              </Button>
+            </div>
           </div>
+
+          {/* Payman Connection */}
+          {paymanAccessToken ? (
+            <Card className="p-4 bg-green-50 border-green-200">
+              <div className="flex items-center space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                <div>
+                  <p className="text-sm font-medium text-green-800">
+                    Payman Connected
+                  </p>
+                  <p className="text-xs text-green-600">
+                    You can now send gifts via the chat agent.
+                  </p>
+                </div>
+              </div>
+            </Card>
+          ) : (
+            <PaymanConnect />
+          )}
+
+          {/* Contacts Grid */}
+          {contacts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {contacts.map((contact) => (
+                <ContactCard
+                  key={contact.id}
+                  contact={contact}
+                  onEdit={handleEditContact}
+                  onDelete={handleDeleteContact}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed border-gray-200">
+              <div className="flex justify-center mb-4">
+                <div className="p-3 bg-gray-100 rounded-full">
+                  <Users className="w-8 h-8 text-gray-400" />
+                </div>
+              </div>
+              <h3 className="font-semibold text-gray-800 mb-2">No Contacts Found</h3>
+              <p className="text-gray-500 mb-6">Add a contact to get started with automated gifting.</p>
+              <Button 
+                variant="primary" 
+                icon={Plus}
+                onClick={() => setShowAddContact(true)}
+              >
+                Add Your First Contact
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 

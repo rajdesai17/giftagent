@@ -1,16 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Gift, Clock, ArrowRight, User, Heart } from 'lucide-react';
+import { Calendar, Gift, Clock, ArrowRight } from 'lucide-react';
 import Button from '../components/ui/Button';
-import Card from '../components/ui/Card';
 
 const Landing: React.FC = () => {
-  const upcomingBirthdays = [
-    { name: "Sarah's Birthday", date: "March 15", daysLeft: "12 days", icon: User },
-    { name: "Mike's Birthday", date: "March 22", daysLeft: "19 days", icon: Gift },
-    { name: "Emma's Birthday", date: "April 3", daysLeft: "31 days", icon: Heart },
-  ];
-
   const features = [
     {
       icon: Calendar,
@@ -32,7 +25,7 @@ const Landing: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl sm:text-6xl font-bold mb-6">
             Birthday Gift <span className="text-gray-400">Agent</span>
@@ -56,7 +49,7 @@ const Landing: React.FC = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">How it works</h2>
@@ -80,7 +73,7 @@ const Landing: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gray-900 text-white">
+      <section className="py-16 bg-gray-900 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">
             Ready to be the friend who never forgets?

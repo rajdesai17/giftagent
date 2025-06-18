@@ -73,7 +73,7 @@ const History: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Gift History</h1>
@@ -82,12 +82,12 @@ const History: React.FC = () => {
       </div>
 
       {loading ? (
-        <div className="text-center py-12">
+        <div className="text-center py-16">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading gift history...</p>
         </div>
       ) : transactions.length === 0 ? (
-        <Card className="text-center py-12">
+        <Card className="text-center py-16">
           <Gift className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-500 mb-2">No gifts sent yet</p>
           <p className="text-sm text-gray-400">Your gift sending history will appear here</p>
@@ -95,8 +95,8 @@ const History: React.FC = () => {
       ) : (
         <div className="space-y-4">
           {transactions.map((transaction) => (
-            <Card key={transaction.id} className="p-6">
-              <div className="flex items-start justify-between">
+            <Card key={transaction.id} className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between space-y-4 sm:space-y-0">
                 <div className="flex items-start space-x-4">
                   <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                     <img
@@ -105,11 +105,11 @@ const History: React.FC = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-lg font-medium text-gray-900 truncate">
                       Gift for {transaction.recipient_name}
                     </h3>
-                    <p className="text-gray-500">{transaction.gift_name}</p>
+                    <p className="text-gray-500 truncate">{transaction.gift_name}</p>
                     <div className="mt-2 flex items-center space-x-4">
                       <span className="text-lg font-semibold text-gray-900">
                         ${transaction.gift_price}
@@ -120,7 +120,7 @@ const History: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-left sm:text-right flex-shrink-0">
                   <div className="flex items-center text-sm text-gray-500 space-x-1">
                     <Clock className="w-4 h-4" />
                     <span>{formatDate(transaction.created_at)}</span>
