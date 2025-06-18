@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Plus, MessageCircle, CheckCircle, ExternalLink } from 'lucide-react';
+import { Plus, MessageCircle, CheckCircle, Users } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/ui/Button';
 import DashboardNav from '../components/Dashboard/DashboardNav';
@@ -85,7 +85,7 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <DashboardNav />
+            <DashboardNav onChatClick={() => setShowChat(true)} />
           </div>
 
           {/* Main Content */}
@@ -93,8 +93,8 @@ const Dashboard: React.FC = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Your Contacts</h1>
-                <p className="text-gray-600">Manage birthdays and schedule gifts for your friends</p>
+                <h1 className="text-2xl font-bold text-gray-900">Contact Dashboard</h1>
+                <p className="text-gray-600">Schedule and track birthday gifts for your friends.</p>
               </div>
               <div className="flex space-x-3">
                 <Button
@@ -102,7 +102,7 @@ const Dashboard: React.FC = () => {
                   icon={MessageCircle}
                   onClick={() => setShowChat(true)}
                 >
-                  Chat with Agent
+                  Gift with AI
                 </Button>
                 <Button 
                   variant="secondary" 
@@ -140,13 +140,18 @@ const Dashboard: React.FC = () => {
                   <ContactCard
                     key={contact.id}
                     contact={contact}
-                    onClick={() => console.log('Contact clicked:', contact.name)}
                   />
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
-                <p className="text-gray-500 mb-4">No contacts yet</p>
+              <div className="text-center py-20 bg-white rounded-lg border-2 border-dashed border-gray-200">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 bg-gray-100 rounded-full">
+                    <Users className="w-8 h-8 text-gray-400" />
+                  </div>
+                </div>
+                <h3 className="font-semibold text-gray-800 mb-2">No Contacts Found</h3>
+                <p className="text-gray-500 mb-6">Add a contact to get started with automated gifting.</p>
                 <Button 
                   variant="primary" 
                   icon={Plus}
