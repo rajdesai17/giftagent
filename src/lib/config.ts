@@ -1,6 +1,6 @@
 // Helper: safely fetch environment variable by trying several keys
 function getEnv(...keys: string[]): string | undefined {
-  // Prefer process.env (Edge / Node)
+  // In edge runtime, directly check process.env first
   if (typeof process !== 'undefined' && process.env) {
     for (const k of keys) {
       const val = process.env[k];
@@ -28,13 +28,14 @@ function getEnv(...keys: string[]): string | undefined {
 }
 
 export const config = {
+  // For edge runtime, prioritize non-VITE prefixed env vars
   supabaseUrl: getEnv('SUPABASE_URL', 'VITE_SUPABASE_URL'),
   supabaseAnonKey: getEnv('SUPABASE_ANON_KEY', 'VITE_SUPABASE_ANON_KEY'),
   storePaytag: getEnv('STORE_PAYTAG', 'VITE_STORE_PAYTAG'),
   paymanClientId: getEnv('PAYMAN_CLIENT_ID', 'VITE_PAYMAN_CLIENT_ID'),
   paymanClientSecret: getEnv('PAYMAN_CLIENT_SECRET', 'VITE_PAYMAN_CLIENT_SECRET'),
   paymanEnvironment: getEnv('PAYMAN_ENVIRONMENT', 'VITE_PAYMAN_ENVIRONMENT'),
-  // Add non-VITE prefixed versions for the edge
+  // Keep legacy support
   SUPABASE_URL: getEnv('SUPABASE_URL'),
   SUPABASE_ANON_KEY: getEnv('SUPABASE_ANON_KEY'),
   STORE_PAYTAG: getEnv('STORE_PAYTAG'),
