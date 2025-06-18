@@ -8,6 +8,7 @@ import PaymanConnect from '../components/Dashboard/PaymanConnect';
 import ContactCard from '../components/Dashboard/ContactCard';
 import ChatInterface from '../components/Chat/ChatInterface';
 import AddContactModal from '../components/Dashboard/AddContactModal';
+import DeleteContactModal from '../components/Dashboard/DeleteContactModal';
 import { Contact, Gift } from '../types';
 import Card from '../components/ui/Card';
 import { supabase } from '../lib/supabase';
@@ -17,6 +18,9 @@ const Dashboard: React.FC = () => {
   const [contacts, setContacts] = useState<(Contact & { gift?: Gift })[]>([]);
   const [showChat, setShowChat] = useState(false);
   const [showAddContact, setShowAddContact] = useState(false);
+  const [showDeleteContact, setShowDeleteContact] = useState(false);
+  const [contactToEdit, setContactToEdit] = useState<(Contact & { gift?: Gift }) | undefined>(undefined);
+  const [contactToDelete, setContactToDelete] = useState<(Contact & { gift?: Gift }) | null>(null);
 
   useEffect(() => {
     const handlePaymanMessage = async (event: MessageEvent) => {
@@ -101,6 +105,40 @@ const Dashboard: React.FC = () => {
     console.log('Processing gift request:', message);
   };
 
+  const handleEditContact = (contact: Contact & { gift?: Gift }) => {
+    setContactToEdit(contact);
+    setShowAddContact(true);
+  };
+
+  const handleDeleteContact = (contact: Contact & { gift?: Gift }) => {
+    setContactToDelete(contact);
+    setShowDeleteContact(true);
+  };
+
+  const confirmDeleteContact = async () => {
+    if (!contactToDelete || !user) return;
+
+    const { error } = await supabase
+      .from('contacts')
+      .delete()
+      .eq('id', contactToDelete.id)
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('Error deleting contact:', error);
+      throw error;
+    }
+
+    // Reload contacts after successful deletion
+    await loadContacts();
+    setContactToDelete(null);
+  };
+
+  const handleCloseAddModal = () => {
+    setShowAddContact(false);
+    setContactToEdit(undefined);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -162,6 +200,8 @@ const Dashboard: React.FC = () => {
                   <ContactCard
                     key={contact.id}
                     contact={contact}
+                    onEdit={handleEditContact}
+                    onDelete={handleDeleteContact}
                   />
                 ))}
               </div>
@@ -197,8 +237,20 @@ const Dashboard: React.FC = () => {
       {/* Add Contact Modal */}
       <AddContactModal
         isOpen={showAddContact}
-        onClose={() => setShowAddContact(false)}
+        onClose={handleCloseAddModal}
         onSuccess={loadContacts}
+        contactToEdit={contactToEdit}
+      />
+
+      {/* Delete Contact Modal */}
+      <DeleteContactModal
+        isOpen={showDeleteContact}
+        onClose={() => {
+          setShowDeleteContact(false);
+          setContactToDelete(null);
+        }}
+        onConfirm={confirmDeleteContact}
+        contact={contactToDelete}
       />
     </div>
   );

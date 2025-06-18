@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
@@ -6,15 +6,21 @@ import { mockGifts } from '../../lib/mockGifts';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import Input from '../ui/Input';
-import { Gift } from '../../types';
+import { Gift, Contact } from '../../types';
 
 interface AddContactModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  contactToEdit?: Contact & { gift?: Gift };
 }
 
-const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClose, onSuccess }) => {
+const AddContactModal: React.FC<AddContactModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  onSuccess, 
+  contactToEdit 
+}) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +32,39 @@ const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClose, onSu
     birthday: '',
     address: ''
   });
+
+  const isEditing = !!contactToEdit;
+
+  // Pre-populate form when editing
+  useEffect(() => {
+    if (contactToEdit && isOpen) {
+      setFormData({
+        name: contactToEdit.name,
+        email: contactToEdit.email,
+        phone: contactToEdit.phone,
+        birthday: contactToEdit.birthday,
+        address: contactToEdit.address
+      });
+      
+      // Set selected gift if contact has one
+      if (contactToEdit.gift) {
+        const giftFromMock = mockGifts.find(g => g.id === contactToEdit.gift?.id);
+        setSelectedGift(giftFromMock || null);
+      } else {
+        setSelectedGift(null);
+      }
+    } else if (!contactToEdit) {
+      // Reset form for new contact
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        birthday: '',
+        address: ''
+      });
+      setSelectedGift(null);
+    }
+  }, [contactToEdit, isOpen]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -70,7 +109,7 @@ const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClose, onSu
     setError(null);
 
     try {
-      const { data, error: insertError } = await supabase.from('contacts').insert([{
+      const contactData = {
         user_id: user.id,
         name: formData.name.trim(),
         email: formData.email.trim().toLowerCase(),
@@ -82,10 +121,29 @@ const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClose, onSu
         gift_price: selectedGift?.price || null,
         gift_image: selectedGift?.image || null,
         gift_category: selectedGift?.category || null,
-        created_at: new Date().toISOString()
-      }]).select();
+      };
 
-      if (insertError) throw insertError;
+      if (isEditing) {
+        // Update existing contact
+        const { error: updateError } = await supabase
+          .from('contacts')
+          .update(contactData)
+          .eq('id', contactToEdit.id)
+          .eq('user_id', user.id);
+
+        if (updateError) throw updateError;
+      } else {
+        // Insert new contact
+        const { error: insertError } = await supabase
+          .from('contacts')
+          .insert([{
+            ...contactData,
+            created_at: new Date().toISOString()
+          }])
+          .select();
+
+        if (insertError) throw insertError;
+      }
 
       // Reset form
       setFormData({
@@ -99,9 +157,10 @@ const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClose, onSu
       
       onSuccess();
       onClose();
-    } catch (err: any) {
-      console.error('Error adding contact:', err);
-      setError(err.message || 'Failed to add contact. Please try again.');
+    } catch (err: unknown) {
+      console.error(`Error ${isEditing ? 'updating' : 'adding'} contact:`, err);
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(errorMessage || `Failed to ${isEditing ? 'update' : 'add'} contact. Please try again.`);
     } finally {
       setLoading(false);
     }
@@ -113,7 +172,9 @@ const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClose, onSu
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold">Add New Contact</h2>
+          <h2 className="text-xl font-semibold">
+            {isEditing ? 'Edit Contact' : 'Add New Contact'}
+          </h2>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="w-4 h-4" />
           </Button>
@@ -222,7 +283,10 @@ const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClose, onSu
               type="submit"
               loading={loading}
             >
-              {loading ? 'Adding Contact...' : 'Add Contact'}
+              {loading 
+                ? `${isEditing ? 'Updating' : 'Adding'} Contact...` 
+                : `${isEditing ? 'Update' : 'Add'} Contact`
+              }
             </Button>
           </div>
         </form>
