@@ -47,7 +47,7 @@ const Landing: React.FC = () => {
           </div>
           
           <p className="text-sm text-gray-400 italic">
-            Powered by Payman with love
+            Powered by Payman SDK with love
           </p>
         </div>
       </section>
