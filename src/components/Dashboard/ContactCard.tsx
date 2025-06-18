@@ -1,7 +1,7 @@
 import React from 'react';
-import { Calendar, MapPin, Check, Clock, Edit2, Trash2 } from 'lucide-react';
-import { format, differenceInDays, isPast } from 'date-fns';
-import Card from '../ui/Card';
+import { Calendar, MapPin, Edit2, Trash2 } from 'lucide-react';
+import { format, differenceInDays } from 'date-fns';
+
 import Button from '../ui/Button';
 import { Contact, Gift } from '../../types';
 
@@ -25,16 +25,6 @@ const ContactCard: React.FC<ContactCardProps> = ({ contact, onEdit, onDelete, on
   
   const daysUntilBirthday = differenceInDays(nextBirthday, today);
 
-  const getGiftStatus = () => {
-    if (!contact.gift) return null;
-    if (isPast(new Date(contact.gift.delivery_date))) {
-      return { text: 'Delivered', icon: Check, color: 'text-green-600' };
-    }
-    return { text: 'Scheduled', icon: Clock, color: 'text-blue-600' };
-  };
-
-  const giftStatus = getGiftStatus();
-
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     onEdit?.(contact);
@@ -46,7 +36,7 @@ const ContactCard: React.FC<ContactCardProps> = ({ contact, onEdit, onDelete, on
   };
 
   return (
-    <Card hover className="p-5 group" onClick={onClick}>
+    <div className="bg-white rounded-lg border border-gray-200 p-5 hover:shadow-md transition-shadow cursor-pointer group" onClick={onClick}>
       <div className="flex flex-col h-full">
         <div className="flex-grow">
           <div className="flex items-start justify-between mb-4">
@@ -101,15 +91,9 @@ const ContactCard: React.FC<ContactCardProps> = ({ contact, onEdit, onDelete, on
             <MapPin className="w-4 h-4 mr-1.5" />
             <span className="truncate">{contact.address}</span>
           </div>
-          {giftStatus && (
-            <div className={`flex items-center text-sm font-medium ${giftStatus.color}`}>
-              <giftStatus.icon className="w-4 h-4 mr-1.5" />
-              <span>{giftStatus.text}</span>
-            </div>
-          )}
         </div>
       </div>
-    </Card>
+    </div>
   );
 };
 
