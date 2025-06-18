@@ -153,7 +153,7 @@ const Dashboard: React.FC = () => {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Contact Dashboard</h1>
-              <p className="text-gray-600">Schedule and track birthday gifts for your friends.</p>
+              <p className="text-gray-600">Never miss a birthday again. Let AI handle the surprises.</p>
             </div>
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
               <Button

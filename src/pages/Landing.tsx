@@ -34,7 +34,7 @@ const Landing: React.FC = () => {
             for Thoughtful Friends
           </p>
           <p className="text-lg text-gray-500 mb-12 max-w-2xl mx-auto">
-            Automate birthday gifts for your friends and family, so you never miss a special day.
+            Never miss a birthday again. Let AI handle the surprises.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -45,6 +45,10 @@ const Landing: React.FC = () => {
               </Button>
             </Link>
           </div>
+          
+          <p className="text-sm text-gray-400 italic">
+            Powered by Payman with love
+          </p>
         </div>
       </section>
 
@@ -76,10 +80,10 @@ const Landing: React.FC = () => {
       <section className="py-16 bg-gray-900 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">
-            Ready to be the friend who never forgets?
+            Ready to become the friend who never forgets?
           </h2>
           <p className="text-xl text-gray-300 mb-12">
-            Join thousands of thoughtful people who use GiftAgent to strengthen their relationships
+          Currently in early access — built for people who care enough to never forget.
           </p>
           <Link to="/auth">
             <Button variant="outline" size="lg" className="bg-white text-gray-900 hover:bg-gray-100">
