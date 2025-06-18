@@ -102,7 +102,7 @@ const Dashboard: React.FC = () => {
                   icon={MessageCircle}
                   onClick={() => setShowChat(true)}
                 >
-                  Gift with AI
+                  Chat with GiftAgent
                 </Button>
                 <Button 
                   variant="secondary" 
