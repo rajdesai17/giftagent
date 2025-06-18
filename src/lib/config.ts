@@ -1,20 +1,36 @@
-// Simple configuration that works in both edge runtime and browser
+// Configuration that works in both edge runtime and browser environments
 const getEnvVar = (key: string): string | undefined => {
-  // For edge runtime, environment variables should be available directly
+  // For edge runtime (Vercel cron functions)
   if (typeof process !== 'undefined' && process.env) {
     return process.env[key];
   }
   return undefined;
 };
 
+// Get browser environment variable (Vite)
+const getBrowserEnvVar = (key: string): string | undefined => {
+  try {
+    // In browser, access Vite environment variables
+    const viteEnv = (import.meta as { env?: Record<string, string> }).env;
+    return viteEnv?.[key];
+  } catch {
+    return undefined;
+  }
+};
+
+// Get environment variable with fallback for browser
+const getEnvWithFallback = (edgeKey: string, browserKey: string): string | undefined => {
+  return getEnvVar(edgeKey) || getBrowserEnvVar(browserKey);
+};
+
 export const config = {
-  // Primary configuration for edge runtime
-  supabaseUrl: getEnvVar('SUPABASE_URL'),
-  supabaseAnonKey: getEnvVar('SUPABASE_ANON_KEY'),
-  storePaytag: getEnvVar('STORE_PAYTAG'),
-  paymanClientId: getEnvVar('PAYMAN_CLIENT_ID'),
-  paymanClientSecret: getEnvVar('PAYMAN_CLIENT_SECRET'),
-  paymanEnvironment: getEnvVar('PAYMAN_ENVIRONMENT'),
+  // Configuration that works in both environments
+  supabaseUrl: getEnvWithFallback('SUPABASE_URL', 'VITE_SUPABASE_URL'),
+  supabaseAnonKey: getEnvWithFallback('SUPABASE_ANON_KEY', 'VITE_SUPABASE_ANON_KEY'),
+  storePaytag: getEnvWithFallback('STORE_PAYTAG', 'VITE_STORE_PAYTAG'),
+  paymanClientId: getEnvWithFallback('PAYMAN_CLIENT_ID', 'VITE_PAYMAN_CLIENT_ID'),
+  paymanClientSecret: getEnvWithFallback('PAYMAN_CLIENT_SECRET', 'VITE_PAYMAN_CLIENT_SECRET'),
+  paymanEnvironment: getEnvWithFallback('PAYMAN_ENVIRONMENT', 'VITE_PAYMAN_ENVIRONMENT'),
   
   // Legacy support (keeping the same structure)
   SUPABASE_URL: getEnvVar('SUPABASE_URL'),

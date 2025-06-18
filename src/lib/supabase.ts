@@ -3,11 +3,12 @@ import { config } from './config';
 
 // Check if we're in an edge function environment
 const isEdgeRuntime = typeof process !== 'undefined' && process.env.EDGE_RUNTIME === '1';
+const isBrowser = typeof window !== 'undefined';
 
 const supabaseUrl = config.supabaseUrl || config.SUPABASE_URL;
 const supabaseAnonKey = config.supabaseAnonKey || config.SUPABASE_ANON_KEY;
 
-// Enhanced debugging for edge runtime
+// Enhanced debugging for different environments
 if (isEdgeRuntime) {
   console.log('=== EDGE RUNTIME DEBUG ===');
   console.log('Environment variables check:');
@@ -24,10 +25,23 @@ if (isEdgeRuntime) {
   }
   
   console.log('=== END DEBUG ===');
+} else if (isBrowser) {
+  console.log('=== BROWSER DEBUG ===');
+  console.log('- Config supabaseUrl:', !!config.supabaseUrl);
+  console.log('- Config supabaseAnonKey:', !!config.supabaseAnonKey);
+  console.log('- Final supabaseUrl:', !!supabaseUrl);
+  console.log('- Final supabaseAnonKey:', !!supabaseAnonKey);
+  
+  if (supabaseUrl) {
+    console.log('- Supabase URL starts with:', supabaseUrl.substring(0, 20) + '...');
+  }
+  
+  console.log('=== END BROWSER DEBUG ===');
 }
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  const errorMsg = `Supabase configuration missing in edge runtime: URL=${!!supabaseUrl}, Key=${!!supabaseAnonKey}`;
+  const environment = isEdgeRuntime ? 'edge runtime' : isBrowser ? 'browser' : 'unknown';
+  const errorMsg = `Supabase configuration missing in ${environment}: URL=${!!supabaseUrl}, Key=${!!supabaseAnonKey}`;
   console.error(errorMsg);
   
   // Additional debugging for missing vars
