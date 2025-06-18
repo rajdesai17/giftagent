@@ -31,7 +31,7 @@ export async function checkAndSendBirthdayGifts() {
     try {
       const { error: testError } = await supabase
         .from('contacts')
-        .select('count(*)')
+        .select('id')
         .limit(1);
       
       if (testError) {
