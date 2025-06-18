@@ -60,7 +60,29 @@ const Dashboard: React.FC = () => {
       .order('created_at', { ascending: false });
     
     if (data) {
-      setContacts(data);
+      // Transform flat gift fields into nested gift object
+      const transformedContacts = data.map(contact => {
+        const transformedContact: Contact & { gift?: Gift & { delivery_date: string } } = {
+          ...contact,
+        };
+
+        // If contact has gift data, create nested gift object
+        if (contact.gift_id && contact.gift_name) {
+          transformedContact.gift = {
+            id: contact.gift_id,
+            name: contact.gift_name,
+            price: contact.gift_price,
+            image: contact.gift_image,
+            description: '',
+            category: contact.gift_category,
+            delivery_date: contact.birthday // Use birthday as delivery date for scheduled gifts
+          };
+        }
+
+        return transformedContact;
+      });
+      
+      setContacts(transformedContacts);
     }
   };
 

@@ -49,7 +49,7 @@ const ContactCard: React.FC<ContactCardProps> = ({ contact, onClick }) => {
           {contact.gift ? (
             <div className="flex items-center space-x-3 mb-4">
               <img
-                src={contact.gift.image_url}
+                src={contact.gift.image}
                 alt={contact.gift.name}
                 className="w-14 h-14 rounded-lg object-cover"
               />
