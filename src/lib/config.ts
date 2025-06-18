@@ -1,36 +1,31 @@
-// Configuration that works in both edge runtime and browser environments
-const getEnvVar = (key: string): string | undefined => {
-  // For edge runtime (Vercel cron functions)
+// Declare the global variables defined by Vite
+declare const __SUPABASE_URL__: string;
+declare const __SUPABASE_ANON_KEY__: string;
+declare const __STORE_PAYTAG__: string;
+declare const __PAYMAN_CLIENT_ID__: string;
+declare const __PAYMAN_CLIENT_SECRET__: string;
+declare const __PAYMAN_ENVIRONMENT__: string;
+
+// Configuration that works in both edge runtime and browser
+const getEnvVar = (key: string, browserValue?: string): string | undefined => {
+  // For edge runtime (Vercel functions) - use process.env
   if (typeof process !== 'undefined' && process.env) {
-    return process.env[key];
+    const value = process.env[key];
+    if (value) return value;
   }
-  return undefined;
-};
-
-// Get browser environment variable (Vite)
-const getBrowserEnvVar = (key: string): string | undefined => {
-  try {
-    // In browser, access Vite environment variables
-    const viteEnv = (import.meta as { env?: Record<string, string> }).env;
-    return viteEnv?.[key];
-  } catch {
-    return undefined;
-  }
-};
-
-// Get environment variable with fallback for browser
-const getEnvWithFallback = (edgeKey: string, browserKey: string): string | undefined => {
-  return getEnvVar(edgeKey) || getBrowserEnvVar(browserKey);
+  
+  // For browser environment - use defined variables
+  return browserValue;
 };
 
 export const config = {
   // Configuration that works in both environments
-  supabaseUrl: getEnvWithFallback('SUPABASE_URL', 'VITE_SUPABASE_URL'),
-  supabaseAnonKey: getEnvWithFallback('SUPABASE_ANON_KEY', 'VITE_SUPABASE_ANON_KEY'),
-  storePaytag: getEnvWithFallback('STORE_PAYTAG', 'VITE_STORE_PAYTAG'),
-  paymanClientId: getEnvWithFallback('PAYMAN_CLIENT_ID', 'VITE_PAYMAN_CLIENT_ID'),
-  paymanClientSecret: getEnvWithFallback('PAYMAN_CLIENT_SECRET', 'VITE_PAYMAN_CLIENT_SECRET'),
-  paymanEnvironment: getEnvWithFallback('PAYMAN_ENVIRONMENT', 'VITE_PAYMAN_ENVIRONMENT'),
+  supabaseUrl: getEnvVar('SUPABASE_URL', __SUPABASE_URL__),
+  supabaseAnonKey: getEnvVar('SUPABASE_ANON_KEY', __SUPABASE_ANON_KEY__),
+  storePaytag: getEnvVar('STORE_PAYTAG', __STORE_PAYTAG__),
+  paymanClientId: getEnvVar('PAYMAN_CLIENT_ID', __PAYMAN_CLIENT_ID__),
+  paymanClientSecret: getEnvVar('PAYMAN_CLIENT_SECRET', __PAYMAN_CLIENT_SECRET__),
+  paymanEnvironment: getEnvVar('PAYMAN_ENVIRONMENT', __PAYMAN_ENVIRONMENT__),
   
   // Legacy support (keeping the same structure)
   SUPABASE_URL: getEnvVar('SUPABASE_URL'),
