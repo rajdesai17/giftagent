@@ -3,27 +3,29 @@ import paymanClient from './payman';
 import { format } from 'date-fns';
 import { config } from './config';
 
-interface BirthdayContact {
-  id: string;
-  user_id: string;
-  name: string;
-  email: string;
-  birthday: string;
-  address: string;
-  gift_id?: string;
-  gift_name?: string;
-  gift_price?: number;
-  gift_image?: string;
-  gift_category?: string;
-}
-
-// Check if we're in an edge function environment
-const isEdgeRuntime = typeof process !== 'undefined' && process.env.EDGE_RUNTIME === '1';
-
 export async function checkAndSendBirthdayGifts() {
   try {
     // Get today's date in MM-DD format
     const today = format(new Date(), 'MM-dd');
+    
+    console.log('=== BIRTHDAY DEBUGGING ===');
+    console.log('Today\'s date:', new Date().toISOString());
+    console.log('Searching for birthday format:', today);
+    console.log('LIKE pattern:', `%${today}%`);
+    
+    // First, let's see ALL contacts for debugging
+    const { data: allContacts, error: allContactsError } = await supabase
+      .from('contacts')
+      .select('id, name, birthday, gift_id, gift_price');
+    
+    if (allContactsError) {
+      console.error('Error fetching all contacts:', allContactsError);
+    } else {
+      console.log('All contacts in database:');
+      allContacts?.forEach(contact => {
+        console.log(`- ${contact.name}: birthday="${contact.birthday}", gift_id=${contact.gift_id}, gift_price=${contact.gift_price}`);
+      });
+    }
     
     // Fetch contacts whose birthdays are today
     const { data: birthdayContacts, error: contactsError } = await supabase
@@ -34,6 +36,8 @@ export async function checkAndSendBirthdayGifts() {
     if (contactsError) throw contactsError;
     
     console.log(`Found ${birthdayContacts?.length || 0} birthdays today`);
+    console.log('Birthday contacts:', birthdayContacts);
+    console.log('=== END DEBUGGING ===');
 
     const storePaytag = config.storePaytag || config.STORE_PAYTAG;
     if (!storePaytag) throw new Error('Store Paytag not configured');
@@ -65,6 +69,8 @@ export async function checkAndSendBirthdayGifts() {
           if (txError) throw txError;
 
           console.log(`Successfully sent birthday gift to ${contact.name}`);
+        } else {
+          console.log(`Contact ${contact.name} has no gift configured (gift_id: ${contact.gift_id}, gift_price: ${contact.gift_price})`);
         }
       } catch (error) {
         console.error(`Error processing gift for ${contact.name}:`, error);
