@@ -41,35 +41,16 @@ const Landing: React.FC = () => {
             for Thoughtful Friends
           </p>
           <p className="text-lg text-gray-500 mb-12 max-w-2xl mx-auto">
-            We create beautiful, conversion focused products for startups and founders
+            Automate birthday gifts for your friends and family, so you never miss a special day.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <Link to="/auth">
               <Button size="lg" className="w-full sm:w-auto">
-                View Dashboard
+                Get Started
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
-            <Button variant="ghost" size="lg" className="w-full sm:w-auto">
-              Book a call
-            </Button>
-          </div>
-
-          {/* Upcoming Birthdays Preview */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {upcomingBirthdays.map((birthday, index) => (
-              <Card key={index} className="p-6 text-center">
-                <div className="flex justify-center mb-4">
-                  <div className="p-3 bg-gray-100 rounded-full">
-                    <birthday.icon className="w-6 h-6 text-gray-600" />
-                  </div>
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">{birthday.name}</h3>
-                <p className="text-gray-500 text-sm mb-2">{birthday.date} • {birthday.daysLeft}</p>
-                <div className="w-full h-20 bg-gray-100 rounded-lg"></div>
-              </Card>
-            ))}
           </div>
         </div>
       </section>
