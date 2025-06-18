@@ -1,7 +1,8 @@
 import { PaymanClient } from "@paymanai/payman-ts";
 
 export const config = {
-  runtime: "edge",
+  // Use the Node.js runtime so that Node-only dependencies work correctly.
+  runtime: "nodejs18.x",
 };
 
 export default async function handler(req: Request) {

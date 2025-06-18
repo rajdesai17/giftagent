@@ -1,7 +1,9 @@
 import { checkAndSendBirthdayGifts } from '../../src/lib/automatedGifting';
 
 export const config = {
-  runtime: 'edge',
+  // Use the Node.js serverless runtime (default is Node 20).
+  // This allows importing packages that rely on Node APIs which are not available in the Edge runtime.
+  runtime: 'nodejs18.x',
   regions: ['bom1'],
 };
 
